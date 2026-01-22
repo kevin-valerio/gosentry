@@ -14,9 +14,9 @@ use libafl::{
     prelude::{
         havoc_mutations, powersched::PowerSchedule, tokens_mutations, CalibrationStage, CanTrack,
         ClientDescription, EventConfig, GitAwareStdWeightedScheduler, GitRecencyMapMetadata,
-        I2SRandReplace, IndexesLenTimeMinimizerScheduler, Launcher, MultiMapObserver,
-        RandBytesGenerator, SimpleMonitor, StdMOptMutator, StdMapObserver, TimeFeedback,
-        TimeObserver, Tokens, TuiMonitor,
+        GitRecencyConfigMetadata, I2SRandReplace, IndexesLenTimeMinimizerScheduler, Launcher,
+        MultiMapObserver, RandBytesGenerator, SimpleMonitor, StdMOptMutator, StdMapObserver,
+        TimeFeedback, TimeObserver, Tokens, TuiMonitor,
     },
     stages::{mutational::StdMutationalStage, ShadowTracingStage, StdPowerMutationalStage},
     state::{HasCorpus, HasExecutions, HasSolutions, StdState, Stoppable},
@@ -48,7 +48,6 @@ use std::{
     time::Duration,
 };
 
-use addr2line::Loader;
 use object::{Object, ObjectSection, ObjectSymbol, RelocationTarget, SectionKind};
 
 type NonSimdMaxMapFeedback<C, O> = MapFeedback<C, DifferentIsNovel, O, MaxReducer>;
@@ -86,6 +85,7 @@ struct LibAflFuzzConfig {
     exec_timeout_ms: Option<u64>,
     stop_all_fuzzers_on_panic: Option<bool>,
     power_schedule: Option<String>,
+    git_recency_alpha: Option<f64>,
     corpus_cache_size: Option<usize>,
     initial_generated_inputs: Option<usize>,
     initial_input_max_len: Option<usize>,
@@ -519,34 +519,38 @@ fn extract_go_o_from_harness(harness_lib: &Path) -> Vec<u8> {
     out.stdout
 }
 
-fn addr2line_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u32)> {
+fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u32)> {
     if addrs.is_empty() {
         return HashMap::new();
     }
 
-    let spawn = |prog: &str| -> std::io::Result<std::process::Child> {
-        Command::new(prog)
-            .arg("-e")
-            .arg(obj_path)
-            .arg("-a")
-            .stdin(Stdio::piped())
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn()
-    };
-
-    // Prefer llvm-addr2line when available: it correctly resolves Go DWARF in
-    // relocatable objects, while binutils addr2line often returns "go.go:?".
-    let mut child = match spawn("llvm-addr2line") {
-        Ok(child) => child,
-        Err(_) => match spawn("addr2line") {
-            Ok(child) => child,
-            Err(err) => {
-                eprintln!("golibafl: failed to run addr2line: {err}");
-                std::process::exit(2);
-            }
-        },
-    };
+    let go_bin = env::var("GO_PATH")
+        .ok()
+        .filter(|s| !s.trim().is_empty())
+        .or_else(|| {
+            env::var_os("GOROOT")
+                .filter(|s| !s.is_empty())
+                .and_then(|goroot| {
+                    let p = PathBuf::from(goroot).join("bin").join("go");
+                    if p.exists() {
+                        Some(p.to_string_lossy().to_string())
+                    } else {
+                        None
+                    }
+                })
+        })
+        .unwrap_or_else(|| "go".to_string());
+    let mut child = Command::new(&go_bin)
+        .args(["tool", "addr2line"])
+        .arg(obj_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap_or_else(|err| {
+            eprintln!("golibafl: failed to run '{go_bin} tool addr2line': {err}");
+            std::process::exit(2);
+        });
 
     let mut stderr = child.stderr.take().unwrap();
     let stderr_thread = std::thread::spawn(move || {
@@ -562,24 +566,18 @@ fn addr2line_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, 
     let mut res: HashMap<u64, (String, u32)> = HashMap::new();
     for addr in addrs {
         if let Err(err) = writeln!(stdin, "0x{addr:x}") {
-            eprintln!("golibafl: failed to write to addr2line stdin: {err}");
+            eprintln!("golibafl: failed to write to go addr2line stdin: {err}");
             std::process::exit(2);
         }
 
         // Expect 2 lines per address:
-        //  - "0x1234"
+        //  - "function"
         //  - "file.go:123"
-        let mut addr_line = String::new();
-        let n = stdout.read_line(&mut addr_line).unwrap_or(0);
+        let mut _fn_line = String::new();
+        let n = stdout.read_line(&mut _fn_line).unwrap_or(0);
         if n == 0 {
             break;
         }
-        let addr_line = addr_line.trim();
-        if !addr_line.starts_with("0x") {
-            continue;
-        }
-        let addr = u64::from_str_radix(addr_line.trim_start_matches("0x"), 16).unwrap_or(0);
-
         let mut loc_line = String::new();
         let n = stdout.read_line(&mut loc_line).unwrap_or(0);
         if n == 0 {
@@ -595,18 +593,18 @@ fn addr2line_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, 
         if file == "??" || line == 0 {
             continue;
         }
-        res.insert(addr, (file.to_string(), line));
+        res.insert(*addr, (file.to_string(), line));
     }
     drop(stdin);
 
     let status = child.wait().unwrap_or_else(|err| {
-        eprintln!("golibafl: failed to wait for addr2line: {err}");
+        eprintln!("golibafl: failed to wait for go addr2line: {err}");
         std::process::exit(2);
     });
     let stderr = stderr_thread.join().unwrap_or_default();
     if !status.success() {
         eprintln!(
-            "golibafl: addr2line failed: {}",
+            "golibafl: go addr2line failed: {}",
             String::from_utf8_lossy(&stderr)
         );
         std::process::exit(2);
@@ -686,14 +684,6 @@ fn ensure_git_recency_mapping(mapping_path: &Path, target_dir: &Path) {
         eprintln!("golibafl: failed to write {}: {err}", tmp_go_o.display());
         std::process::exit(2);
     });
-    let loader = match Loader::new(&tmp_go_o) {
-        Ok(loader) => Some(loader),
-        Err(err) => {
-            eprintln!("golibafl: failed to load debug info from go.o: {err}");
-            eprintln!("golibafl: falling back to system addr2line for source locations");
-            None
-        }
-    };
 
     let counters_section = obj.section_by_name(".go.fuzzcntrs").unwrap_or_else(|| {
         eprintln!(
@@ -733,36 +723,15 @@ fn ensure_git_recency_mapping(mapping_path: &Path, target_dir: &Path) {
 
             let addr = section_base + offset;
             counter_addrs.insert(idx, addr);
-            if let Some(loader) = loader.as_ref() {
-                let Some(loc) = loader.find_location(addr).ok().flatten() else {
-                    continue;
-                };
-                let Some(file) = loc.file else {
-                    continue;
-                };
-                let Some(line) = loc.line else {
-                    continue;
-                };
-
-                let Some(file_rel) =
-                    resolve_repo_relative_path(file, target_dir, &repo_root, &mut path_cache)
-                else {
-                    continue;
-                };
-                counter_locs.insert(idx, (file_rel, line));
-            }
         }
     }
 
-    if !counter_addrs.is_empty() && counter_locs.len() < counter_addrs.len() {
+    if !counter_addrs.is_empty() {
         let mut addrs: Vec<u64> = counter_addrs.values().copied().collect();
         addrs.sort_unstable();
         addrs.dedup();
-        let locs = addr2line_locations(&tmp_go_o, &addrs);
+        let locs = go_tool_locations(&tmp_go_o, &addrs);
         for (idx, addr) in counter_addrs {
-            if counter_locs.contains_key(&idx) {
-                continue;
-            }
             let Some((file, line)) = locs.get(&addr).cloned() else {
                 continue;
             };
@@ -1042,6 +1011,7 @@ fn fuzz(
     let mut exec_timeout = Duration::new(1, 0);
     let mut stop_all_fuzzers_on_panic = true;
     let mut power_schedule = PowerSchedule::fast();
+    let mut git_recency_alpha: Option<f64> = None;
     let mut corpus_cache_size = 4096usize;
     let mut initial_generated_inputs = 8usize;
     let mut initial_input_max_len = 32usize;
@@ -1090,6 +1060,16 @@ fn fuzz(
                     std::process::exit(2);
                 }
             };
+        }
+        if let Some(alpha) = config.git_recency_alpha {
+            if !(0.0..=10.0).contains(&alpha) {
+                eprintln!(
+                    "golibafl: git_recency_alpha must be in [0.0, 10.0] (config: {})",
+                    config_path.display()
+                );
+                std::process::exit(2);
+            }
+            git_recency_alpha = Some(alpha);
         }
         if let Some(sz) = config.corpus_cache_size {
             if sz == 0 {
@@ -1461,6 +1441,9 @@ fn fuzz(
                             )
                         });
                         state.add_metadata(GitRecencyMapMetadata::load_from_file(map_path)?);
+                        if let Some(alpha) = git_recency_alpha {
+                            state.add_metadata(GitRecencyConfigMetadata::new(alpha));
+                        }
                     }
 
                     let scheduler = IndexesLenTimeMinimizerScheduler::new(

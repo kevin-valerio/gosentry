@@ -50,6 +50,13 @@ Example `libafl.jsonc` (all fields optional; defaults shown in comments):
   // default: 1000
   "exec_timeout_ms": 1000,
 
+  // git_recency_alpha: bias strength for git-aware scheduling when --focus-on-new-code=true
+  // min: 0.0
+  // max: 10.0
+  // default: 2.0
+  // recommended: 2.0
+  "git_recency_alpha": 2.0,
+
   // corpus_cache_size: in-memory cache size for each on-disk corpus
   // default: 4096
   "corpus_cache_size": 4096,
