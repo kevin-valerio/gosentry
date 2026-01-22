@@ -200,7 +200,7 @@ Enable git-aware scheduling with `--focus-on-new-code=true`:
 ./bin/go test -fuzz=FuzzHarness --use-libafl --focus-on-new-code=true
 ```
 
-This mode needs `git` (to run `git blame`) and an `addr2line` implementation to map coverage counters back to source `file:line` (prefer `llvm-addr2line`; fall back to binutils `addr2line`).
+This mode needs `git` (to run `git blame`) and `go tool addr2line` to map coverage counters back to source `file:line`.
 
 <details>
 <summary><strong>How git-blame-oriented fuzzing works</strong></summary>
@@ -214,7 +214,7 @@ This mode needs `git` (to run `git blame`) and an `addr2line` implementation to 
                 v
 ┌───────────────────────────────────────────────────────────────────────────┐
 │ 2) `golibafl` generates a cached "git recency map"                         │
-│    - maps coverage counters -> (file:line) via DWARF / (llvm-)addr2line   │
+│    - maps coverage counters -> (file:line) via `go tool addr2line`        │
 │    - runs `git blame` to get a timestamp per line                         │
 │    - stores timestamps in `git_recency_map.bin`                           │
 └───────────────┬───────────────────────────────────────────────────────────┘
@@ -225,6 +225,20 @@ This mode needs `git` (to run `git blame`) and an `addr2line` implementation to 
 │    - among the corpus, prioritize inputs that hit newer lines             │
 └───────────────────────────────────────────────────────────────────────────┘
 ```
+</details>
+
+<details>
+<summary><strong>How cybergo builds <code>git_recency_map.bin</code> (implementation)</strong></summary>
+
+- `.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`). Its byte length is the number of counters.
+- When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
+  1. Extracting `go.o` from `libharness.a`.
+  2. Reading the `.go.fuzzcntrs` section size to get the counter count `N`.
+  3. Scanning `.text` relocations that reference `.go.fuzzcntrs` symbols to recover the address for each counter index.
+  4. Resolving each address to `file:line` using `go tool addr2line`.
+  5. Running `git blame --line-porcelain` to get `committer-time` per line.
+  6. Writing `git_recency_map.bin` as `u64 head_time` + `u64 N` + `N * u64 timestamps` (little-endian). Unmapped entries use timestamp `0`.
+
 </details>
 
 <details>

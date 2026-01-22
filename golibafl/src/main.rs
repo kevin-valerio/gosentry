@@ -569,7 +569,11 @@ fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u3
             eprintln!("golibafl: failed to write to go addr2line stdin: {err}");
             std::process::exit(2);
         }
+    }
+    drop(stdin);
 
+    // `go tool addr2line` writes output only after stdin is closed.
+    for addr in addrs {
         // Expect 2 lines per address:
         //  - "function"
         //  - "file.go:123"
@@ -578,11 +582,13 @@ fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u3
         if n == 0 {
             break;
         }
+
         let mut loc_line = String::new();
         let n = stdout.read_line(&mut loc_line).unwrap_or(0);
         if n == 0 {
             break;
         }
+
         let loc_tok = loc_line.split_whitespace().next().unwrap_or("");
         let Some((file, line)) = loc_tok.rsplit_once(':') else {
             continue;
@@ -595,7 +601,6 @@ fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u3
         }
         res.insert(*addr, (file.to_string(), line));
     }
-    drop(stdin);
 
     let status = child.wait().unwrap_or_else(|err| {
         eprintln!("golibafl: failed to wait for go addr2line: {err}");

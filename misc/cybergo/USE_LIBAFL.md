@@ -20,7 +20,7 @@ When `--use-libafl` is set, `--focus-on-new-code={true|false}` is **required**.
 - `--focus-on-new-code=false`: keep the current behavior.
 - `--focus-on-new-code=true`: prefer inputs that execute recently changed lines (based on `git blame`).
 
-Note: `--focus-on-new-code=true` needs `git` (to run `git blame`) and an `addr2line` implementation to map coverage counters back to source `file:line` (prefer `llvm-addr2line`; fall back to binutils `addr2line`).
+Note: `--focus-on-new-code=true` needs `git` (to run `git blame`) and `go tool addr2line` to map coverage counters back to source `file:line`.
 
 Implementation note: the git-aware scheduler currently comes from a local LibAFL fork (TODO: switch back to upstream LibAFL once upstreamed).
 
