@@ -20,9 +20,9 @@ Workflow:
 EOF
 }
 
-trials=5
-warmup_s=30
-timeout_s=120
+trials=3
+warmup_s=5
+timeout_s=60
 workdir=""
 keep=false
 
@@ -117,35 +117,96 @@ EOF
 cat > rlp/cybergo_focus_new_code_target.go <<'EOF'
 package rlp
 
-import "math/bits"
+import (
+	"encoding/binary"
+	"math/bits"
+)
 
 var cybergoFocusNewCodeSink uint32
 
-func cybergoFocusNewCodeDenom(data []byte) uint32 {
-	// Bit-mixing hash over the non-prefix bytes. Avoids integer overflow: cybergo
-	// may trap on overflowing arithmetic operations in fuzz builds.
-	var h uint32 = 0x9e3779b9
-	end := len(data)
-	if end > 512 {
-		end = 512
+// A small-ish amount of deterministic "old code" work to generate a rich corpus and
+// distract baseline scheduling (mirrors the reth benchmark's intent).
+func cybergoFocusNewCodeState(data []byte) uint64 {
+	if len(data) == 0 {
+		return 0
 	}
-	for i := 4; i < end; i++ {
-		h ^= uint32(data[i])
-		h = bits.RotateLeft32(h, 5) ^ bits.RotateLeft32(h, -7) ^ 0x9e3779b9
+
+	var s uint64 = 0x9e3779b97f4a7c15
+
+	// Exercise raw RLP parsing on multiple offsets to generate lots of coverage
+	// variation without requiring hard-to-solve constraints.
+	for off := 0; off < 4 && off < len(data); off++ {
+		k, content, rest, err := Split(data[off:])
+		if err != nil {
+			s ^= uint64(off+1) * 0x100000001b3
+			continue
+		}
+
+		s ^= uint64(k) << (off * 3)
+		s ^= uint64(len(content))<<16 ^ uint64(len(rest))<<1
+		if len(content) > 0 {
+			s = bits.RotateLeft64(s, int(content[0]%63+1)) ^ 0x9e3779b97f4a7c15
+		} else {
+			s = bits.RotateLeft64(s, 13) ^ 0x9e3779b97f4a7c15
+		}
+
+		// If it's a list, iterate a few elements to create more state/coverage.
+		if k == List {
+			b := content
+			for i := 0; i < 8 && len(b) > 0; i++ {
+				kk, cc, rr, e := Split(b)
+				if e != nil {
+					s ^= uint64(i+1)<<32 ^ 0x27d4eb2f165667c5
+					break
+				}
+				s ^= uint64(kk) << (i * 2)
+				if len(cc) > 0 {
+					s ^= uint64(cc[0])<<8 ^ uint64(cc[len(cc)-1])
+				}
+				b = rr
+			}
+		}
 	}
-	// denom==0 iff (h&0x3fff)==0x211b.
-	return (h & 0x3fff) ^ 0x211b
+
+	// Mix in a fast, branchy splitter for an integer.
+	for off := 0; off < 4 && off < len(data); off++ {
+		x, _, err := SplitUint64(data[off:])
+		if err == nil {
+			s ^= bits.RotateLeft64(x, 13) ^ 0x517cc1b727220a95
+		} else {
+			s ^= 0x94d049bb133111eb
+		}
+	}
+
+	return s
+}
+
+func cybergoFocusNewCodeDenom(data []byte, state uint64) uint32 {
+	// Avoid overflowing arithmetic: keep denom in 14 bits. denom==0 iff
+	// (mixed&0x1fff)==0x11b (i.e. 0x211b truncated to 13 bits).
+	const rawOff = 512
+	if len(data) < rawOff+4 {
+		return 1
+	}
+	raw := binary.LittleEndian.Uint32(data[rawOff : rawOff+4])
+	mixed := raw ^ bits.RotateLeft32(uint32(state), 7) ^ bits.RotateLeft32(uint32(state>>32), -3)
+	return (mixed & 0x1fff) ^ 0x11b
 }
 
 func CybergoFocusNewCodeTarget(data []byte) {
-	if len(data) < 8 {
+	if len(data) < 4 {
 		return
 	}
+	state := cybergoFocusNewCodeState(data)
 	// Prefix gate: keep the "interesting" path rare-ish, but make sure the same
 	// line gets hit by lots of non-crashing inputs (so git-aware scheduling has
 	// a signal to boost).
 	if data[0] == 'G' && data[1] == 'E' && data[2] == 'T' && data[3] == 'H' {
-		cybergoFocusNewCodeRecentLine(data)
+		// Keep this path on a moderately long input so mutations aren't dominated
+		// by constantly breaking the prefix.
+		if len(data) >= 516 {
+			cybergoFocusNewCodeRecentLine(data, state)
+		}
 	}
 }
 EOF
@@ -154,8 +215,8 @@ cat > rlp/cybergo_focus_new_code_recent_bug.go <<'EOF'
 package rlp
 
 //go:noinline
-func cybergoFocusNewCodeRecentLine(data []byte) {
-	cybergoFocusNewCodeSink ^= cybergoFocusNewCodeDenom(data) + 1 // CYBERGO_PLACEHOLDER
+func cybergoFocusNewCodeRecentLine(data []byte, state uint64) {
+	cybergoFocusNewCodeSink ^= cybergoFocusNewCodeDenom(data, state) + 1 // CYBERGO_PLACEHOLDER
 }
 EOF
 
@@ -189,9 +250,6 @@ from pathlib import Path
 in_dir = Path(${warmup_in@Q})
 in_dir.mkdir(parents=True, exist_ok=True)
 
-MASK = 0x3FFF
-XOR = 0x211B
-
 def prng_bytes(n: int, seed: int) -> bytes:
     x = seed & 0xFFFFFFFF
     b = bytearray()
@@ -200,32 +258,10 @@ def prng_bytes(n: int, seed: int) -> bytes:
         b.append((x >> 16) & 0xFF)
     return bytes(b)
 
-def denom(data: bytes) -> int:
-    h = 0x9E3779B9
-    def rotl32(x: int, r: int) -> int:
-        r &= 31
-        return ((x << r) | (x >> (32 - r))) & 0xFFFFFFFF
-    def rotr32(x: int, r: int) -> int:
-        r &= 31
-        return ((x >> r) | (x << (32 - r))) & 0xFFFFFFFF
-    for bb in data[4 : min(len(data), 512)]:
-        h ^= bb
-        h = (rotl32(h, 5) ^ rotr32(h, 7) ^ 0x9E3779B9) & 0xFFFFFFFF
-    return (h & MASK) ^ XOR
-
-def write_seed(name: str, prefix: bytes, seed: int) -> None:
-    (in_dir / name).write_bytes(prefix + prng_bytes(4096 - len(prefix), seed))
-
-def write_noncrashing(name: str, prefix: bytes, seed: int) -> None:
-    while True:
-        data = prefix + prng_bytes(4096 - len(prefix), seed)
-        if denom(data) != 0:
-            (in_dir / name).write_bytes(data)
-            return
-        seed += 1
-
-write_noncrashing("seed_recent_path", b"GETH", 0x12345678)
-write_noncrashing("seed_other", b"NOPE", 0x87654321)
+# Multiple seeds reduce variance; they will be deduped/minimized by warmup.
+for i in range(4):
+    (in_dir / f"seed_recent_path_{i}").write_bytes(b"GETH" + prng_bytes(4096 - 4, 0x12345678 + i))
+    (in_dir / f"seed_other_{i}").write_bytes(b"NOPE" + prng_bytes(4096 - 4, 0x87654321 + i))
 PY
 
 harness_no_bug="${workdir}/harness-no-bug"
@@ -259,46 +295,6 @@ fi
 warmup_queue_dir="$(dirname "${warmup_queue_file}")"
 echo "warmup corpus: ${warmup_queue_dir}"
 
-python3 - <<PY
-from pathlib import Path
-
-queue_dir = Path(${warmup_queue_dir@Q})
-mask = 0x3FFF
-xor = 0x211B
-
-def denom(data: bytes) -> int:
-    h = 0x9E3779B9
-    def rotl32(x: int, r: int) -> int:
-        r &= 31
-        return ((x << r) | (x >> (32 - r))) & 0xFFFFFFFF
-    def rotr32(x: int, r: int) -> int:
-        r &= 31
-        return ((x >> r) | (x << (32 - r))) & 0xFFFFFFFF
-    for bb in data[4 : min(len(data), 512)]:
-        h ^= bb
-        h = (rotl32(h, 5) ^ rotr32(h, 7) ^ 0x9E3779B9) & 0xFFFFFFFF
-    return (h & mask) ^ xor
-
-removed = 0
-kept = 0
-for p in sorted(queue_dir.iterdir()):
-    if not p.is_file() or p.name.startswith("."):
-        continue
-    data = p.read_bytes()
-    if len(data) < 8 or data[:4] != b"GETH":
-        kept += 1
-        continue
-    if denom(data) == 0:
-        p.unlink()
-        removed += 1
-    else:
-        kept += 1
-
-print(f"warmup corpus filter: removed={removed} kept={kept}")
-if kept == 0:
-    raise SystemExit("warmup corpus became empty after filtering")
-PY
-
 echo "committing RECENT_BUG (single-line crash)..."
 python3 - <<'PY'
 from pathlib import Path
@@ -310,7 +306,7 @@ for i, line in enumerate(lines):
     if "CYBERGO_PLACEHOLDER" not in line:
         continue
     indent = line[: len(line) - len(line.lstrip())]
-    lines[i] = indent + "cybergoFocusNewCodeSink ^= uint32(0x12345678) / cybergoFocusNewCodeDenom(data) // RECENT_BUG\n"
+    lines[i] = indent + "cybergoFocusNewCodeSink ^= uint32(0x12345678) / cybergoFocusNewCodeDenom(data, state) // RECENT_BUG\n"
     break
 else:
     raise SystemExit("RECENT_BUG placeholder line not found")
@@ -324,6 +320,30 @@ build_harness "${harness_bug}"
 
 golibafl_bug="${workdir}/golibafl-bug"
 build_golibafl "${harness_bug}/libharness.a" "${golibafl_bug}"
+
+echo "filtering warmup corpus: removing inputs that already trigger RECENT_BUG..."
+set +e
+removed=0
+kept=0
+for f in "${warmup_queue_dir}"/*; do
+  if [[ ! -f "${f}" ]] || [[ "$(basename "${f}")" == .* ]]; then
+    continue
+  fi
+  "${golibafl_bug}" run --input "${f}" >/dev/null 2>&1
+  st="$?"
+  if [[ "${st}" -ne 0 ]]; then
+    rm -f -- "${f}"
+    removed=$(( removed + 1 ))
+  else
+    kept=$(( kept + 1 ))
+  fi
+done
+set -e
+echo "warmup corpus filter: removed=${removed} kept=${kept}"
+if [[ "${kept}" -eq 0 ]]; then
+  echo "warmup corpus became empty after filtering"
+  exit 1
+fi
 
 git_map="${workdir}/git_recency_map.bin"
 target_dir="${repo_dir}/rlp"

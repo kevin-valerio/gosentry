@@ -227,6 +227,33 @@ This mode needs `git` (to run `git blame`) and an `addr2line` implementation to 
 ```
 </details>
 
+<details>
+<summary><strong>Benchmark 1 (go-ethereum / geth): baseline vs git-aware</strong></summary>
+
+Executed with `misc/cybergo/bench_focus_on_new_code_geth.sh --trials 5 --warmup 600 --timeout 200`.
+
+```text
+  gitaware_5: crash (7122ms)
+baseline results:
+  trial 1: crash (107747ms)
+  trial 2: crash (146415ms)
+  trial 3: crash (37902ms)
+  trial 4: crash (154034ms)
+  trial 5: timeout (200000ms)
+baseline crashes: 4/5 (timeouts=1, errors=0)
+baseline median (capped to timeout): 146.415s
+
+git-aware results:
+  trial 1: timeout (200000ms)
+  trial 2: crash (87432ms)
+  trial 3: crash (61733ms)
+  trial 4: crash (157540ms)
+  trial 5: crash (7122ms)
+git-aware crashes: 4/5 (timeouts=1, errors=0)
+git-aware median (capped to timeout): 87.432s
+```
+</details>
+
 ## Credits
 
 Credits to Bruno Produit and Nills Ollrogge for their work on [golibafl](https://github.com/srlabs/golibafl/).
