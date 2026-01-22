@@ -292,7 +292,7 @@ build_harness "${harness_no_bug}"
 golibafl_no_bug="${workdir}/golibafl-no-bug"
 build_golibafl "${harness_no_bug}/libharness.a" "${golibafl_no_bug}"
 
-echo "warmup: ${warmup_s}s (baseline, no crash)"
+echo "warmup: ${warmup_s}s - baseline, no crash"
 set +e
 LIBAFL_RAND_SEED=0 LIBAFL_SEED_DIR="${warmup_in}" GOLIBAFL_FOCUS_ON_NEW_CODE=false \
   timeout --signal=INT --kill-after=5s "${warmup_s}" \
