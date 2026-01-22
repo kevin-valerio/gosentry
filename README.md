@@ -19,7 +19,7 @@ It especially has **two** objectives:
   - [Feature 1: Integer overflow and truncation issues detection](#feature-1-integer-overflow-and-truncation-issues-detection)
   - [Feature 2: Panic on selected functions](#feature-2-panic-on-selected-functions)
   - [Feature 3: LibAFL state-of-the-art fuzzing](#feature-3-libafl-state-of-the-art-fuzzing)
-  - [Feature 4: Git-blame-oriented fuzzing](#feature-4-git-blame-oriented-fuzzing)
+  - [Feature 4: Git-blame-oriented fuzzing (experimental)](#feature-4-git-blame-oriented-fuzzing)
 - [Credits](#credits)
 
 ## Build
@@ -184,7 +184,7 @@ cd test/cybergo/examples/reverse
 ../../../../bin/go test -fuzz=FuzzReverse --use-libafl --focus-on-new-code=false
 ```
 
-## Feature 4: Git-blame-oriented fuzzing
+## Feature 4: Git-blame-oriented fuzzing (experimental)
 
 #### Overview
 
