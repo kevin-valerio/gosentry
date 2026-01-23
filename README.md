@@ -7,7 +7,7 @@ cybergo is a security-focused fork of the Go toolchain. In a _very_ simple phras
 - Integrating [go-panikint](https://github.com/trailofbits/go-panikint): instrumentation that panics on **integer overflow/underflow** (and **optionally on truncating integer conversions**).
 - Integrating [LibAFL](https://github.com/AFLplusplus/LibAFL) fuzzer: run Go fuzzing harnesses with **LibAFL** for better fuzzing performances.
 - Panicking on [user-provided function call](https://github.com/kevin-valerio/cybergo?tab=readme-ov-file#feature-2-panic-on-selected-functions): catching targeted bugs when certains functions are called (eg., `myapp.(*Logger).Error`).
-- Git-blame-oriented fuzzing (history-guided): when fuzzing with `--use-libafl`, you can prefer inputs that execute recently changed lines (based on `git blame`).
+- Git-blame-oriented fuzzing (based on [this work](https://github.com/kevin-valerio/LibAFL-git-aware)): when fuzzing with LibAFL mode, you can orientate the fuzzer towards **recently added/edited lines**.
 
 It especially has **two** objectives:
 - Being easy to use and UX-friendly (we're tired of complex tools),
@@ -228,10 +228,9 @@ This mode needs `git` (to run `git blame`) and `go tool addr2line` to map covera
 </details>
 
 <details>
-<summary><strong>How cybergo builds <code>git_recency_map.bin</code> (implementation)</strong></summary>
+<summary><strong>How cybergo builds <code>git_recency_map.bin</code></strong></summary>
 
-- `.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`). Its byte length is the number of counters.
-- When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
+`.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`). Its byte length is the number of counters. When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
   1. Extracting `go.o` from `libharness.a`.
   2. Reading the `.go.fuzzcntrs` section size to get the counter count `N`.
   3. Scanning `.text` relocations that reference `.go.fuzzcntrs` symbols to recover the address for each counter index.
