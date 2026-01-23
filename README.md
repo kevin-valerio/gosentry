@@ -232,7 +232,7 @@ This mode needs `git` (to run `git blame`) and `go tool addr2line` to map covera
 <details>
 <summary><strong>How cybergo builds <code>git_recency_map.bin</code></strong></summary>
 
-`.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`). Its byte length is the number of counters. When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
+`.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`); each byte is "how many times this instrumented spot was hit". When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
   1. Extracting `go.o` from `libharness.a`.
   2. Reading the `.go.fuzzcntrs` section size to get the counter count `N`.
   3. Scanning `.text` relocations that reference `.go.fuzzcntrs` symbols to recover the address for each counter index.
