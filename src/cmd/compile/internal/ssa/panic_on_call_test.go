@@ -3,7 +3,7 @@ package ssa
 import "testing"
 
 func TestSymbolMatcher(t *testing.T) {
-	m := newSymbolMatcher([]string{"log.error", "pkg.sub.*"})
+	m := newSymbolMatcher([]string{"log.error", "pkg.sub*"})
 
 	cases := []struct {
 		sym     string
