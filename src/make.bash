@@ -219,13 +219,13 @@ fi
 ./cmd/dist/dist bootstrap -a $vflag $GO_DISTFLAGS "$@"
 rm -f ./cmd/dist/dist
 
-# cybergo: keep the system-wide cybergo binary in sync with the freshly-built toolchain.
-# Use an atomic replace (via rename) to avoid "Text file busy" when cybergo is currently running.
-sudo install -m 0755 "$GOROOT/bin/go" /usr/bin/cybergo.new
-sudo mv -f /usr/bin/cybergo.new /usr/bin/cybergo
+# gosentry: keep the system-wide gosentry binary in sync with the freshly-built toolchain.
+# Use an atomic replace (via rename) to avoid "Text file busy" when gosentry is currently running.
+sudo install -m 0755 "$GOROOT/bin/go" /usr/bin/gosentry.new
+sudo mv -f /usr/bin/gosentry.new /usr/bin/gosentry
 
 # DO NOT ADD ANY NEW CODE BELOW THIS POINT.
-# For cybergo, the bootstrap+rm + install above are the final step of make.bash.
+# For gosentry, the bootstrap+rm + install above are the final step of make.bash.
 # If something must be added, add it to cmd/dist's cmdbootstrap,
 # to avoid needing three copies in three different shell languages
 # (make.bash, make.bat, make.rc).

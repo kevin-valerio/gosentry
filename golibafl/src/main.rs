@@ -928,7 +928,7 @@ fn fuzz(
 ) {
     let args: Vec<String> = env::args().collect();
     let is_launcher_client = env::var_os("AFL_LAUNCHER_CLIENT").is_some();
-    let verbose = env::var_os("CYBERGO_VERBOSE_AFL").is_some();
+    let verbose = env::var_os("GOSENTRY_VERBOSE_AFL").is_some();
 
     // In launcher mode, `launch_with_hooks` installs signal handlers and starts background
     // threads before running the client closure. When fuzzing Go harnesses linked as a static
@@ -1715,7 +1715,7 @@ fn fuzz(
     match &launch_res {
         Ok(()) | Err(Error::ShuttingDown) => (),
         Err(err) => {
-            if env::var_os("CYBERGO_VERBOSE_AFL").is_some() {
+            if env::var_os("GOSENTRY_VERBOSE_AFL").is_some() {
                 let diag = launch_diagnostics(err);
                 eprint!("{diag}");
                 let diag_path = output.join(format!(

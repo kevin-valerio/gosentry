@@ -282,7 +282,7 @@ control the execution of any test:
 	    (for example, -fuzzminimizetime 100x).
 
 	-use-libafl
-	    When -fuzz is set, use the LibAFL-based runner shipped with cybergo
+	    When -fuzz is set, use the LibAFL-based runner shipped with gosentry
 	    instead of Go's native fuzzing engine.
 
 	-focus-on-new-code={true|false}
@@ -1825,7 +1825,7 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 		}
 		for _, ent := range entries {
 			name := ent.Name()
-			if strings.HasPrefix(name, "cybergo-add-seed-") || strings.HasPrefix(name, "cybergo-testdata-seed-") {
+			if strings.HasPrefix(name, "gosentry-add-seed-") || strings.HasPrefix(name, "gosentry-testdata-seed-") {
 				if err := os.Remove(filepath.Join(inDir, name)); err != nil && !errors.Is(err, fs.ErrNotExist) {
 					return err
 				}
@@ -1843,7 +1843,7 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 					continue
 				}
 				src := filepath.Join(testdataDir, ent.Name())
-				dst := filepath.Join(inDir, fmt.Sprintf("cybergo-testdata-seed-%d-%s", i, ent.Name()))
+				dst := filepath.Join(inDir, fmt.Sprintf("gosentry-testdata-seed-%d-%s", i, ent.Name()))
 				if err := sh.CopyFile(dst, src, 0666, false); err != nil {
 					return err
 				}

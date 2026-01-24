@@ -12,9 +12,9 @@ lto = "fat"
 anyhow = "1.0.100"
 
 [dependencies]
-libafl = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "cybergo-libafl-gitaware", features = ["prelude", "std", "derive", "tui_monitor"] }
-libafl_bolts = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "cybergo-libafl-gitaware" }
-libafl_targets = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "cybergo-libafl-gitaware", features = ["sancov_8bit", "observers", "libfuzzer", "sancov_cmplog", "sancov_pcguard_hitcounts"] }
+libafl = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "gosentry-libafl-gitaware", features = ["prelude", "std", "derive", "tui_monitor"] }
+libafl_bolts = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "gosentry-libafl-gitaware" }
+libafl_targets = { git = "https://github.com/kevin-valerio/LibAFL-git-aware", branch = "gosentry-libafl-gitaware", features = ["sancov_8bit", "observers", "libfuzzer", "sancov_cmplog", "sancov_pcguard_hitcounts"] }
 clap = {version = "4.5.23", features = ["derive"]}
 mimalloc = "0.1.43"
 serde = { version = "1", features = ["derive"] }

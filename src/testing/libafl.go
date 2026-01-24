@@ -44,7 +44,7 @@ const (
 	libaflMaxDepth        = 32
 )
 
-// LibAFLInit initializes cybergo's LibAFL fuzz harness for the given fuzz test.
+// LibAFLInit initializes gosentry's LibAFL fuzz harness for the given fuzz test.
 // This is used by the generated test main when 'go test -fuzz ... -use-libafl'
 // is set.
 func LibAFLInit(name string, fuzzFn func(*F)) error {
@@ -142,7 +142,7 @@ func LibAFLWriteSeeds(dir string) error {
 	}
 
 	for i, seed := range seeds {
-		path := filepath.Join(dir, fmt.Sprintf("cybergo-add-seed-%d", i))
+		path := filepath.Join(dir, fmt.Sprintf("gosentry-add-seed-%d", i))
 		f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
 		if err != nil {
 			if errors.Is(err, fs.ErrExist) {

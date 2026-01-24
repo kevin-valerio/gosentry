@@ -1,14 +1,14 @@
-# cybergo
+# gosentry
 
-[![integration tests](https://github.com/kevin-valerio/cybergo/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/kevin-valerio/cybergo/actions/workflows/go.yml)
+[![integration tests](https://github.com/kevin-valerio/gosentry/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/kevin-valerio/gosentry/actions/workflows/go.yml)
 
-cybergo is a security-focused fork of the Go toolchain. In a _very_ simple phrasing, it's copy of the Go compiler that finds bugs. If you are a security researcher auditing Go codebases, you should probably use this tool and consider it as a great swiss-knife.
+gosentry is a security-focused fork of the Go toolchain. In a _very_ simple phrasing, it's copy of the Go compiler that finds bugs. If you are a security researcher auditing Go codebases, you should probably use this tool and consider it as a great swiss-knife.
 
 For now, it focuses on four things:
 
 - Integrating [go-panikint](https://github.com/trailofbits/go-panikint): instrumentation that panics on **integer overflow/underflow** (and **optionally on truncating integer conversions**).
 - Integrating [LibAFL](https://github.com/AFLplusplus/LibAFL) fuzzer: run Go fuzzing harnesses with **LibAFL** for better fuzzing performances.
-- Panicking on [user-provided function call](https://github.com/kevin-valerio/cybergo?tab=readme-ov-file#feature-2-panic-on-selected-functions): catching targeted bugs when certains functions are called (eg., `myapp.(*Logger).Error`).
+- Panicking on [user-provided function call](https://github.com/kevin-valerio/gosentry?tab=readme-ov-file#feature-2-panic-on-selected-functions): catching targeted bugs when certains functions are called (eg., `myapp.(*Logger).Error`).
 - Git-blame-oriented fuzzing (based on [this work](https://github.com/kevin-valerio/LibAFL-git-aware)): when fuzzing with LibAFL mode, you can orientate the fuzzer towards **recently added/edited lines**.
 
 It especially has **two** objectives:
@@ -74,7 +74,7 @@ However, these errors are usually handled internally (e.g., through retry or pau
 
 #### How to use
 
-Compile cybergo, then use the `--panic-on` flag.
+Compile gosentry, then use the `--panic-on` flag.
 
 ```bash
 ./bin/go test -fuzz=FuzzHarness --use-libafl --focus-on-new-code=false --panic-on="test_go_panicon.(*Logger).Warning,test_go_panicon.(*Logger).Error"
@@ -87,7 +87,7 @@ The example above would panic when either `(*Logger).Warning` or `(*Logger).Erro
 
 ```text
 ┌───────────────────────────────────────────────────────────────────────────┐
-│ 1) cybergo `go test`                                                      │
+│ 1) gosentry `go test`                                                      │
 │    - parses + validates `-panic-on=...` against packages being built      │
 │    - forwards patterns to the compiler via `-panic-on-call=...`           │
 └───────────────┬───────────────────────────────────────────────────────────┘
@@ -109,9 +109,9 @@ In practice, this makes any matched call site behave like a crash/panic for fuzz
 
 ## Feature 3: LibAFL state-of-the-art fuzzing
 
-LibAFL performs *way* better than the traditional Go fuzzer. Using the `--use-libafl` flag runs standard Go fuzz tests (`go test -fuzz=...`) **with** [LibAFL](https://github.com/AFLplusplus/LibAFL). The runner is implemented in `golibafl/`. Without `--use-libafl`, the fuzzer behaves like upstream Go. More documentation in [this Markdown file.](misc/cybergo/USE_LIBAFL.md)
+LibAFL performs *way* better than the traditional Go fuzzer. Using the `--use-libafl` flag runs standard Go fuzz tests (`go test -fuzz=...`) **with** [LibAFL](https://github.com/AFLplusplus/LibAFL). The runner is implemented in `golibafl/`. Without `--use-libafl`, the fuzzer behaves like upstream Go. More documentation in [this Markdown file.](misc/gosentry/USE_LIBAFL.md)
 
-You can also pass an optional config. file for LibAFL, see [here.](misc/cybergo/libafl.config.jsonc)
+You can also pass an optional config. file for LibAFL, see [here.](misc/gosentry/libafl.config.jsonc)
 
 ```bash
 ./bin/go test -fuzz=FuzzHarness --use-libafl --focus-on-new-code=false --libafl-config=path/to/libafl.jsonc # optionnal --libafl-config
@@ -122,7 +122,7 @@ You can also pass an optional config. file for LibAFL, see [here.](misc/cybergo/
 
 ```text
 ┌───────────────────────────────────────────────────────────────────────────┐
-│ 1) cybergo `go test`                                                      │
+│ 1) gosentry `go test`                                                      │
 │    - captures  `testing.F.Fuzz(...)` callback                             │
 │    - generates  extra source file: `_libaflmain.go`                       │
 └───────────────┬───────────────────────────────────────────────────────────┘
@@ -150,7 +150,7 @@ You can also pass an optional config. file for LibAFL, see [here.](misc/cybergo/
 └───────────────────────────────────────────────────────────────────────────┘
 ```
 
-In `--use-libafl` mode, cybergo builds `libharness.a` and the Rust `golibafl` runner drives it in-process via the libFuzzer entrypoints.
+In `--use-libafl` mode, gosentry builds `libharness.a` and the Rust `golibafl` runner drives it in-process via the libFuzzer entrypoints.
 </details>
 
 
@@ -164,25 +164,25 @@ if input == "IMARANDOMSTRINGJUSTCMPLOGMEMAN" {
 ```
 SOTA fuzzers like AFL++ or LibAFL would find the panic instantly in that case. However, Go native fuzzer wouldn't. That is a massive gap that restrains coverage exploration by a **lot**.
 
-The benchmark below show those limits. Note that those benchmarks can be **reproduced** and improved via the [cybergo-bench-libafl repository](https://github.com/kevin-valerio/cybergo-bench-libafl/tree/main).
+The benchmark below show those limits. Note that those benchmarks can be **reproduced** and improved via the [gosentry-bench-libafl repository](https://github.com/kevin-valerio/gosentry-bench-libafl/tree/main).
 
 ##### Benchmark 1:
 
 The chart below is the evolution of the number of lines covered while fuzzing Google's [UUID](https://github.com/google/uuid) using LibAFL vs go native fuzzer.
-![BENCH1](misc/cybergo/5min_uuid_parsebytes_FuzzParseBytes.png "BENCH1")
+![BENCH1](misc/gosentry/5min_uuid_parsebytes_FuzzParseBytes.png "BENCH1")
 
 ##### Benchmark 2:
 
 The chart below is the evolution of the number of lines covered while fuzzing [go-ethereum](https://github.com/ethereum/go-ethereum) using LibAFL vs go native fuzzer.
-![BENCH2](misc/cybergo/go-ethereum-30min.png "BENCH1")
+![BENCH2](misc/gosentry/go-ethereum-30min.png "BENCH1")
 
 
 
 #### Example
-You can test it on some fuzzing harnesses in `test/cybergo/examples/`.
+You can test it on some fuzzing harnesses in `test/gosentry/examples/`.
 
 ```bash
-cd test/cybergo/examples/reverse
+cd test/gosentry/examples/reverse
 ../../../../bin/go test -fuzz=FuzzReverse --use-libafl --focus-on-new-code=false
 ```
 
@@ -190,7 +190,7 @@ cd test/cybergo/examples/reverse
 
 #### Overview
 
-Coverage-guided fuzzing is great at exploring new paths, but it treats all covered code as equally interesting. When fuzzing large codebases, you may want to bias the fuzzer toward recently modified code, where regressions and bugs are more likely to be introduced. In `--use-libafl` mode, cybergo can use `git blame` to prefer inputs that execute recently changed lines (while keeping coverage guidance as the primary signal).
+Coverage-guided fuzzing is great at exploring new paths, but it treats all covered code as equally interesting. When fuzzing large codebases, you may want to bias the fuzzer toward recently modified code, where regressions and bugs are more likely to be introduced. In `--use-libafl` mode, gosentry can use `git blame` to prefer inputs that execute recently changed lines (while keeping coverage guidance as the primary signal).
 
 This work is based on previous work from [LibAFL-git-aware](https://github.com/kevin-valerio/LibAFL-git-aware). All the technical in-depth details are documented there.
 
@@ -209,7 +209,7 @@ This mode needs `git` (to run `git blame`) and `go tool addr2line` to map covera
 
 ```text
 ┌───────────────────────────────────────────────────────────────────────────┐
-│ 1) cybergo `go test -fuzz`                                                │
+│ 1) gosentry `go test -fuzz`                                                │
 │    - builds `libharness.a` (contains `go.o` + `.go.fuzzcntrs`)            │
 │    - runs `golibafl` with `GOLIBAFL_FOCUS_ON_NEW_CODE=1`                  │
 └───────────────┬───────────────────────────────────────────────────────────┘
@@ -230,7 +230,7 @@ This mode needs `git` (to run `git blame`) and `go tool addr2line` to map covera
 </details>
 
 <details>
-<summary><strong>How cybergo builds <code>git_recency_map.bin</code></strong></summary>
+<summary><strong>How gosentry builds <code>git_recency_map.bin</code></strong></summary>
 
 `.go.fuzzcntrs` is the linker section that holds Go's libFuzzer-style **8-bit coverage counters** (enabled by `-gcflags=all=-d=libfuzzer`); each byte is "how many times this instrumented spot was hit". When `--focus-on-new-code=true`, `golibafl` generates `git_recency_map.bin` by:
   1. Extracting `go.o` from `libharness.a`.
@@ -245,7 +245,7 @@ This mode needs `git` (to run `git blame`) and `go tool addr2line` to map covera
 <details>
 <summary><strong>Benchmark 1 (go-ethereum / geth): baseline vs git-aware</strong></summary>
 
-Executed with `misc/cybergo/bench_focus_on_new_code_geth.sh --trials 5 --warmup 600 --timeout 200`.
+Executed with `misc/gosentry/bench_focus_on_new_code_geth.sh --trials 5 --warmup 600 --timeout 200`.
 
 ```text
   gitaware_5: crash (7122ms)
