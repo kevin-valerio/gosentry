@@ -25,6 +25,16 @@ Note: `--focus-on-new-code=true` needs `git` (to run `git blame`) and `go tool a
 `golibafl` stores the generated mapping file under the LibAFL output directory as `git_recency_map.bin` (path provided to the runner via `LIBAFL_GIT_RECENCY_MAPPING_PATH`).
 On large targets, generating this file can take several minutes because it needs to run `go tool addr2line` and `git blame` for many coverage counters.
 
+To make this less “silent”, `golibafl` prints progress during generation (and runs `go tool addr2line` in parallel):
+
+```
+golibafl: generating git recency mapping (450229 counters); this may take a while
+golibafl: running go tool addr2line on 450229 addresses
+golibafl: addr2line sent 120000/450229 got 80000/450229 elapsed 30s
+golibafl: running git blame on 1043 file(s)
+golibafl: git blame progress 702/1043 (67.3%), elapsed 20s
+```
+
 To avoid regenerating the full mapping on commits that don't change the Go harness object (`go.o`), `golibafl` writes a small sidecar file next to it: `git_recency_map.bin.meta.json`.
 If the sidecar indicates the current `go.o` hash matches, `golibafl` will reuse the existing mapping entries and only update the `head_time` header in `git_recency_map.bin`.
 

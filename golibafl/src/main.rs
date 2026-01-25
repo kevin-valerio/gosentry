@@ -577,6 +577,109 @@ fn extract_go_o_from_harness(harness_lib: &Path) -> Vec<u8> {
     out.stdout
 }
 
+fn go_tool_locations_worker(
+    go_bin: &str,
+    obj_path: &Path,
+    addrs: Vec<u64>,
+    sent_counter: Arc<AtomicUsize>,
+    received_counter: Arc<AtomicUsize>,
+) -> HashMap<u64, (String, u32)> {
+    if addrs.is_empty() {
+        return HashMap::new();
+    }
+
+    let addrs = Arc::new(addrs);
+
+    let mut child = Command::new(go_bin)
+        .args(["tool", "addr2line"])
+        .arg(obj_path)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap_or_else(|err| {
+            eprintln!("golibafl: failed to run '{go_bin} tool addr2line': {err}");
+            std::process::exit(2);
+        });
+
+    let mut stderr = child.stderr.take().unwrap();
+    let stderr_thread = std::thread::spawn(move || {
+        let mut buf = Vec::new();
+        let _ = stderr.read_to_end(&mut buf);
+        buf
+    });
+
+    let mut stdin = child.stdin.take().unwrap();
+    let stdout = child.stdout.take().unwrap();
+    let stdout = std::io::BufReader::new(stdout);
+
+    // Drain stdout while feeding stdin: `go tool addr2line` may start emitting output
+    // before stdin is fully closed (buffer flushes), and stdout backpressure can
+    // block further stdin reads.
+    let addrs_reader = Arc::clone(&addrs);
+    let received_counter_reader = Arc::clone(&received_counter);
+    let stdout_thread = std::thread::spawn(move || {
+        let mut stdout = stdout;
+        let mut res: HashMap<u64, (String, u32)> = HashMap::new();
+        let mut idx = 0usize;
+        while idx < addrs_reader.len() {
+            let mut _fn_line = String::new();
+            let n = stdout.read_line(&mut _fn_line).unwrap_or(0);
+            if n == 0 {
+                break;
+            }
+
+            let mut loc_line = String::new();
+            let n = stdout.read_line(&mut loc_line).unwrap_or(0);
+            if n == 0 {
+                break;
+            }
+            received_counter_reader.fetch_add(1, Ordering::Relaxed);
+
+            let addr = addrs_reader[idx];
+            idx += 1;
+
+            let loc_tok = loc_line.split_whitespace().next().unwrap_or("");
+            if let Some((file, line)) = loc_tok.rsplit_once(':') {
+                if let Ok(line) = line.parse::<u32>() {
+                    if file != "??" && line != 0 {
+                        res.insert(addr, (file.to_string(), line));
+                    }
+                }
+            }
+        }
+        res
+    });
+
+    for addr in addrs.iter() {
+        if let Err(err) = writeln!(stdin, "0x{addr:x}") {
+            eprintln!("golibafl: failed to write to go addr2line stdin: {err}");
+            std::process::exit(2);
+        }
+        sent_counter.fetch_add(1, Ordering::Relaxed);
+    }
+    drop(stdin);
+
+    let status = child.wait().unwrap_or_else(|err| {
+        eprintln!("golibafl: failed to wait for go addr2line: {err}");
+        std::process::exit(2);
+    });
+    let stderr = stderr_thread.join().unwrap_or_default();
+    if !status.success() {
+        eprintln!(
+            "golibafl: go addr2line failed: {}",
+            String::from_utf8_lossy(&stderr)
+        );
+        std::process::exit(2);
+    }
+
+    let res = stdout_thread.join().unwrap_or_else(|_| {
+        eprintln!("golibafl: addr2line stdout reader panicked");
+        std::process::exit(2);
+    });
+    res
+}
+
 fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u32)> {
     if addrs.is_empty() {
         return HashMap::new();
@@ -598,59 +701,31 @@ fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u3
                 })
         })
         .unwrap_or_else(|| "go".to_string());
-    let mut child = Command::new(&go_bin)
-        .args(["tool", "addr2line"])
-        .arg(obj_path)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
-        .unwrap_or_else(|err| {
-            eprintln!("golibafl: failed to run '{go_bin} tool addr2line': {err}");
-            std::process::exit(2);
-        });
-
-    let mut stderr = child.stderr.take().unwrap();
-    let stderr_thread = std::thread::spawn(move || {
-        let mut buf = Vec::new();
-        let _ = stderr.read_to_end(&mut buf);
-        buf
-    });
-
-    let mut stdin = child.stdin.take().unwrap();
-    let stdout = child.stdout.take().unwrap();
-    let mut stdout = std::io::BufReader::new(stdout);
-
-    let mut res: HashMap<u64, (String, u32)> = HashMap::new();
-    for addr in addrs {
-        if let Err(err) = writeln!(stdin, "0x{addr:x}") {
-            eprintln!("golibafl: failed to write to go addr2line stdin: {err}");
-            std::process::exit(2);
-        }
-    }
-    drop(stdin);
-
-    // `go tool addr2line` writes output only after stdin is closed.
     let total = addrs.len();
-    let processed_counter = Arc::new(AtomicUsize::new(0));
+    let sent_counter = Arc::new(AtomicUsize::new(0));
+    let received_counter = Arc::new(AtomicUsize::new(0));
     let heartbeat = if total > 10_000 {
-        let processed_counter = Arc::clone(&processed_counter);
+        let sent_counter = Arc::clone(&sent_counter);
+        let received_counter = Arc::clone(&received_counter);
         let (stop_tx, stop_rx) = mpsc::channel::<()>();
         let handle = std::thread::spawn(move || {
             let started = Instant::now();
-            let mut last = 0usize;
             loop {
                 match stop_rx.recv_timeout(Duration::from_secs(15)) {
                     Ok(()) | Err(mpsc::RecvTimeoutError::Disconnected) => break,
                     Err(mpsc::RecvTimeoutError::Timeout) => {
-                        let cur = processed_counter.load(Ordering::Relaxed);
-                        if cur == last {
-                            eprintln!(
-                                "golibafl: addr2line still running ({cur}/{total}); elapsed {}s",
-                                started.elapsed().as_secs()
-                            );
-                        }
-                        last = cur;
+                        let sent = sent_counter.load(Ordering::Relaxed);
+                        let received = received_counter.load(Ordering::Relaxed);
+                        eprintln!(
+                            concat!(
+                                "golibafl: addr2line sent {sent}/{total} ",
+                                "got {received}/{total} elapsed {elapsed}s"
+                            ),
+                            sent = sent,
+                            total = total,
+                            received = received,
+                            elapsed = started.elapsed().as_secs()
+                        );
                     }
                 }
             }
@@ -659,66 +734,41 @@ fn go_tool_locations(obj_path: &Path, addrs: &[u64]) -> HashMap<u64, (String, u3
     } else {
         None
     };
-    let started = Instant::now();
-    let mut last_progress = Instant::now();
-    let mut processed = 0usize;
-    for addr in addrs {
-        // Expect 2 lines per address:
-        //  - "function"
-        //  - "file.go:123"
-        let mut _fn_line = String::new();
-        let n = stdout.read_line(&mut _fn_line).unwrap_or(0);
-        if n == 0 {
-            break;
-        }
 
-        let mut loc_line = String::new();
-        let n = stdout.read_line(&mut loc_line).unwrap_or(0);
-        if n == 0 {
-            break;
-        }
-        processed += 1;
-        processed_counter.store(processed, Ordering::Relaxed);
+    let max_workers = std::thread::available_parallelism()
+        .map(|n| n.get())
+        .unwrap_or(1);
+    let workers = max_workers.max(1).min(total.max(1));
+    let chunk_size = total.div_ceil(workers);
 
-        let loc_tok = loc_line.split_whitespace().next().unwrap_or("");
-        if let Some((file, line)) = loc_tok.rsplit_once(':') {
-            if let Ok(line) = line.parse::<u32>() {
-                if file != "??" && line != 0 {
-                    res.insert(*addr, (file.to_string(), line));
-                }
-            }
-        }
-
-        let done = processed;
-        if total > 10_000
-            && (last_progress.elapsed() >= Duration::from_secs(10) || done == total)
-        {
-            let elapsed = started.elapsed().as_secs_f64().max(0.001);
-            let pct = (done as f64) * 100.0 / (total as f64);
-            let rate = (done as f64) / elapsed;
-            eprintln!(
-                "golibafl: addr2line progress {done}/{total} ({pct:.1}%), {rate:.0} addr/s"
-            );
-            last_progress = Instant::now();
-        }
+    let mut handles = Vec::new();
+    for chunk in addrs.chunks(chunk_size) {
+        let obj_path = obj_path.to_path_buf();
+        let chunk_addrs = chunk.to_vec();
+        let sent_counter = Arc::clone(&sent_counter);
+        let received_counter = Arc::clone(&received_counter);
+        let go_bin = go_bin.clone();
+        handles.push(std::thread::spawn(move || {
+            go_tool_locations_worker(
+                &go_bin,
+                &obj_path,
+                chunk_addrs,
+                sent_counter,
+                received_counter,
+            )
+        }));
+    }
+    let mut res: HashMap<u64, (String, u32)> = HashMap::new();
+    for h in handles {
+        res.extend(h.join().unwrap_or_else(|_| {
+            eprintln!("golibafl: addr2line worker panicked");
+            std::process::exit(2);
+        }));
     }
 
     if let Some((stop_tx, handle)) = heartbeat {
         let _ = stop_tx.send(());
         let _ = handle.join();
-    }
-
-    let status = child.wait().unwrap_or_else(|err| {
-        eprintln!("golibafl: failed to wait for go addr2line: {err}");
-        std::process::exit(2);
-    });
-    let stderr = stderr_thread.join().unwrap_or_default();
-    if !status.success() {
-        eprintln!(
-            "golibafl: go addr2line failed: {}",
-            String::from_utf8_lossy(&stderr)
-        );
-        std::process::exit(2);
     }
 
     res
