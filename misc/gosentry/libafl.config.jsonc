@@ -45,7 +45,7 @@
 
   // tui_monitor: enable LibAFL's interactive terminal UI (TUI).
   // default: true
-  "tui_monitor": true,
+  "tui_monitor": false,
 
   // debug_output: force-enable/disable LIBAFL_DEBUG_OUTPUT (otherwise auto).
   // default: auto (enabled when running with a single client)
