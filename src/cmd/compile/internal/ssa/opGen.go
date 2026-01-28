@@ -4486,6 +4486,7 @@ const (
 	OpLOONG64NEGD
 	OpLOONG64SQRTD
 	OpLOONG64SQRTF
+	OpLOONG64ABSF
 	OpLOONG64ABSD
 	OpLOONG64CLZW
 	OpLOONG64CLZV
@@ -4709,7 +4710,6 @@ const (
 	OpMIPSXOR
 	OpMIPSXORconst
 	OpMIPSNOR
-	OpMIPSNORconst
 	OpMIPSNEG
 	OpMIPSNEGF
 	OpMIPSNEGD
@@ -4825,7 +4825,6 @@ const (
 	OpMIPS64XOR
 	OpMIPS64XORconst
 	OpMIPS64NOR
-	OpMIPS64NORconst
 	OpMIPS64NEGV
 	OpMIPS64NEGF
 	OpMIPS64NEGD
@@ -69673,6 +69672,19 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
+		name:   "ABSF",
+		argLen: 1,
+		asm:    loong64.AABSF,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, 4611686017353646080}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, 4611686017353646080}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		name:   "ABSD",
 		argLen: 1,
 		asm:    loong64.AABSD,
@@ -72739,20 +72751,6 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
-		name:    "NORconst",
-		auxType: auxInt32,
-		argLen:  1,
-		asm:     mips.ANOR,
-		reg: regInfo{
-			inputs: []inputInfo{
-				{0, 469762046}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 R28 g R31
-			},
-			outputs: []outputInfo{
-				{0, 335544318}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 R28 R31
-			},
-		},
-	},
-	{
 		name:   "NEG",
 		argLen: 1,
 		reg: regInfo{
@@ -74270,20 +74268,6 @@ var opcodeTable = [...]opInfo{
 			inputs: []inputInfo{
 				{0, 234881022}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 g R31
 				{1, 234881023}, // ZERO R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 g R31
-			},
-			outputs: []outputInfo{
-				{0, 167772158}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 R31
-			},
-		},
-	},
-	{
-		name:    "NORconst",
-		auxType: auxInt64,
-		argLen:  1,
-		asm:     mips.ANOR,
-		reg: regInfo{
-			inputs: []inputInfo{
-				{0, 234881022}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 g R31
 			},
 			outputs: []outputInfo{
 				{0, 167772158}, // R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15 R16 R17 R18 R19 R20 R21 R22 R24 R25 R31
