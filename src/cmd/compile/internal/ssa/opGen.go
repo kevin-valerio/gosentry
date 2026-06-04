@@ -769,8 +769,6 @@ const (
 	OpAMD64SARLconst
 	OpAMD64SARWconst
 	OpAMD64SARBconst
-	OpAMD64SHRDQ
-	OpAMD64SHLDQ
 	OpAMD64ROLQ
 	OpAMD64ROLL
 	OpAMD64ROLW
@@ -6597,6 +6595,12 @@ const (
 	OpWasmI8x16AvgrU
 	OpWasmI16x8AvgrU
 	OpWasmV128Bitselect
+	OpWasmI8x16Splat
+	OpWasmI16x8Splat
+	OpWasmI32x4Splat
+	OpWasmF32x4Splat
+	OpWasmI64x2Splat
+	OpWasmF64x2Splat
 	OpWasmF32x4Ceil
 	OpWasmF64x2Ceil
 	OpWasmF64x2ConvertLowI32x4S
@@ -7346,6 +7350,12 @@ const (
 	OpBitSelectUint16x8
 	OpBitSelectUint32x4
 	OpBitSelectUint64x2
+	OpBroadcastFloat32x4
+	OpBroadcastFloat64x2
+	OpBroadcastInt8x16
+	OpBroadcastInt16x8
+	OpBroadcastInt32x4
+	OpBroadcastInt64x2
 	OpCeilFloat32x4
 	OpCeilFloat32x8
 	OpCeilFloat64x2
@@ -15105,42 +15115,6 @@ var opcodeTable = [...]opInfo{
 		reg: regInfo{
 			inputs: []inputInfo{
 				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-			},
-			outputs: []outputInfo{
-				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-			},
-		},
-	},
-	{
-		name:         "SHRDQ",
-		argLen:       3,
-		resultInArg0: true,
-		clobberFlags: true,
-		earlyOk:      true,
-		asm:          x86.ASHRQ,
-		reg: regInfo{
-			inputs: []inputInfo{
-				{2, regMask{v1: 2, v2: 0}},     // CX
-				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-				{1, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-			},
-			outputs: []outputInfo{
-				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-			},
-		},
-	},
-	{
-		name:         "SHLDQ",
-		argLen:       3,
-		resultInArg0: true,
-		clobberFlags: true,
-		earlyOk:      true,
-		asm:          x86.ASHLQ,
-		reg: regInfo{
-			inputs: []inputInfo{
-				{2, regMask{v1: 2, v2: 0}},     // CX
-				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
-				{1, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
 			},
 			outputs: []outputInfo{
 				{0, regMask{v1: 49135, v2: 0}}, // AX CX DX BX BP SI DI R8 R9 R10 R11 R12 R13 R15
@@ -102455,6 +102429,84 @@ var opcodeTable = [...]opInfo{
 		},
 	},
 	{
+		name:   "I8x16Splat",
+		argLen: 1,
+		asm:    wasm.AI8x16Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 65535, v2: 0}}, // R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
+		name:   "I16x8Splat",
+		argLen: 1,
+		asm:    wasm.AI16x8Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 65535, v2: 0}}, // R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
+		name:   "I32x4Splat",
+		argLen: 1,
+		asm:    wasm.AI32x4Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 65535, v2: 0}}, // R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
+		name:   "F32x4Splat",
+		argLen: 1,
+		asm:    wasm.AF32x4Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 4294901760, v2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
+		name:   "I64x2Splat",
+		argLen: 1,
+		asm:    wasm.AI64x2Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 65535, v2: 0}}, // R0 R1 R2 R3 R4 R5 R6 R7 R8 R9 R10 R11 R12 R13 R14 R15
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
+		name:   "F64x2Splat",
+		argLen: 1,
+		asm:    wasm.AF64x2Splat,
+		reg: regInfo{
+			inputs: []inputInfo{
+				{0, regMask{v1: 281470681743360, v2: 0}}, // F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			outputs: []outputInfo{
+				{0, regMask{v1: 18446462598732840960, v2: 0}}, // V0 V1 V2 V3 V4 V5 V6 V7 V8 V9 V10 V11 V12 V13 V14 V15
+			},
+		},
+	},
+	{
 		name:   "F32x4Ceil",
 		argLen: 1,
 		asm:    wasm.AF32x4Ceil,
@@ -107970,6 +108022,36 @@ var opcodeTable = [...]opInfo{
 	{
 		name:    "BitSelectUint64x2",
 		argLen:  3,
+		generic: true,
+	},
+	{
+		name:    "BroadcastFloat32x4",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "BroadcastFloat64x2",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "BroadcastInt8x16",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "BroadcastInt16x8",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "BroadcastInt32x4",
+		argLen:  1,
+		generic: true,
+	},
+	{
+		name:    "BroadcastInt64x2",
+		argLen:  1,
 		generic: true,
 	},
 	{
