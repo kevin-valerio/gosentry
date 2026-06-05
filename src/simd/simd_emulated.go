@@ -22,12 +22,14 @@ func Emulated() bool {
 	return true
 }
 
-// EmulatedCarrylessMultiply returns whether CarrylessMultiply is emulated.
-// This sometimes matters to choice of algorithm (e.g., when computing CRC).
-// The emulation's execution time does not depend on its inputs, so it is
-// okay in that sense.
-func EmulatedCarrylessMultiply() bool {
-	return true
+// HasHardwareCarrylessMultiply returns whether this platform
+// has a hardware-implemented version of carryless multiply.
+// With default GODEBUG=simd settings, if this is false,
+// it is emulated and merely slow, but with non-default settings
+// this can indicate the possibility of a missing instruction
+// that will fail ("SIGILL") if it is executed.
+func HasHardwareCarrylessMultiply() bool {
+	return false
 }
 
 type _simd struct {
@@ -289,8 +291,9 @@ func (x Int8s) Store(s []int8) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Int8s) StorePart(s []int8) {
+func (x Int8s) StorePart(s []int8) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -650,8 +653,9 @@ func (x Int16s) Store(s []int16) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Int16s) StorePart(s []int16) {
+func (x Int16s) StorePart(s []int16) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -1004,8 +1008,9 @@ func (x Int32s) Store(s []int32) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Int32s) StorePart(s []int32) {
+func (x Int32s) StorePart(s []int32) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -1247,8 +1252,9 @@ func (x Int64s) Store(s []int64) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Int64s) StorePart(s []int64) {
+func (x Int64s) StorePart(s []int64) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -1483,8 +1489,9 @@ func (x Uint8s) Store(s []uint8) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Uint8s) StorePart(s []uint8) {
+func (x Uint8s) StorePart(s []uint8) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -1831,8 +1838,9 @@ func (x Uint16s) Store(s []uint16) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Uint16s) StorePart(s []uint16) {
+func (x Uint16s) StorePart(s []uint16) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -2156,8 +2164,9 @@ func (x Uint32s) Store(s []uint32) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Uint32s) StorePart(s []uint32) {
+func (x Uint32s) StorePart(s []uint32) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -2405,8 +2414,9 @@ func (x Uint64s) Store(s []uint64) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Uint64s) StorePart(s []uint64) {
+func (x Uint64s) StorePart(s []uint64) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -2709,8 +2719,9 @@ func (x Float32s) Store(s []float32) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Float32s) StorePart(s []float32) {
+func (x Float32s) StorePart(s []float32) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -2982,8 +2993,9 @@ func (x Float64s) Store(s []float64) {
 }
 
 // StorePart stores a partial vector into the slice s.
-func (x Float64s) StorePart(s []float64) {
+func (x Float64s) StorePart(s []float64) int {
 	x.Store(s)
+	return min(len(s), x.Len())
 }
 
 // String returns a string representation of the vector.
@@ -3166,11 +3178,11 @@ func (x Uint64s) mwl(y Uint64s) Uint64s {
 
 var (
 	// For mK, bits J such that J mod 5 == K are set
-	m0 = newT(0x0084210842108421, 0x1108421084210842)
-	m1 = newT(0x1108421084210842, 0x3210842108421084)
-	m2 = newT(0x3210842108421084, 0x8421084210842108)
+	m0 = newT(0x1084210842108421, 0x2108421084210842)
+	m1 = newT(0x2108421084210842, 0x4210842108421084)
+	m2 = newT(0x4210842108421084, 0x8421084210842108)
 	m3 = newT(0x8421084210842108, 0x0842108421084210)
-	m4 = newT(0x0842108421084210, 0x0084210842108421)
+	m4 = newT(0x0842108421084210, 0x1084210842108421)
 )
 
 func (x Uint64s) clmul(y Uint64s) Uint64s {

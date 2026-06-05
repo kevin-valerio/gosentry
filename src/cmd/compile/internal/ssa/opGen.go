@@ -7406,6 +7406,22 @@ const (
 	OpConcatAddPairsUint16x8
 	OpConcatAddPairsUint32x4
 	OpConcatAddPairsUint64x2
+	OpConcatEvenInt8x16
+	OpConcatEvenInt16x8
+	OpConcatEvenInt32x4
+	OpConcatEvenInt64x2
+	OpConcatEvenUint8x16
+	OpConcatEvenUint16x8
+	OpConcatEvenUint32x4
+	OpConcatEvenUint64x2
+	OpConcatOddInt8x16
+	OpConcatOddInt16x8
+	OpConcatOddInt32x4
+	OpConcatOddInt64x2
+	OpConcatOddUint8x16
+	OpConcatOddUint16x8
+	OpConcatOddUint32x4
+	OpConcatOddUint64x2
 	OpConcatPermuteFloat32x4
 	OpConcatPermuteFloat32x8
 	OpConcatPermuteFloat32x16
@@ -7502,22 +7518,6 @@ const (
 	OpConvertToUint64Float64x2
 	OpConvertToUint64Float64x4
 	OpConvertToUint64Float64x8
-	OpDeinterleaveEvenInt8x16
-	OpDeinterleaveEvenInt16x8
-	OpDeinterleaveEvenInt32x4
-	OpDeinterleaveEvenInt64x2
-	OpDeinterleaveEvenUint8x16
-	OpDeinterleaveEvenUint16x8
-	OpDeinterleaveEvenUint32x4
-	OpDeinterleaveEvenUint64x2
-	OpDeinterleaveOddInt8x16
-	OpDeinterleaveOddInt16x8
-	OpDeinterleaveOddInt32x4
-	OpDeinterleaveOddInt64x2
-	OpDeinterleaveOddUint8x16
-	OpDeinterleaveOddUint16x8
-	OpDeinterleaveOddUint32x4
-	OpDeinterleaveOddUint64x2
 	OpDivFloat32x4
 	OpDivFloat32x8
 	OpDivFloat32x16
@@ -7727,6 +7727,14 @@ const (
 	OpGreaterUint32x16
 	OpGreaterUint64x2
 	OpGreaterUint64x8
+	OpInterleaveEvenInt8x16
+	OpInterleaveEvenInt16x8
+	OpInterleaveEvenInt32x4
+	OpInterleaveEvenInt64x2
+	OpInterleaveEvenUint8x16
+	OpInterleaveEvenUint16x8
+	OpInterleaveEvenUint32x4
+	OpInterleaveEvenUint64x2
 	OpInterleaveHiGroupedInt16x16
 	OpInterleaveHiGroupedInt16x32
 	OpInterleaveHiGroupedInt32x8
@@ -7767,6 +7775,14 @@ const (
 	OpInterleaveLoUint16x8
 	OpInterleaveLoUint32x4
 	OpInterleaveLoUint64x2
+	OpInterleaveOddInt8x16
+	OpInterleaveOddInt16x8
+	OpInterleaveOddInt32x4
+	OpInterleaveOddInt64x2
+	OpInterleaveOddUint8x16
+	OpInterleaveOddUint16x8
+	OpInterleaveOddUint32x4
+	OpInterleaveOddUint64x2
 	OpLeadingSignBitsInt8x16
 	OpLeadingSignBitsInt16x8
 	OpLeadingSignBitsInt32x4
@@ -7831,8 +7847,6 @@ const (
 	OpLessUint32x4
 	OpLessUint32x16
 	OpLessUint64x8
-	OpLookupOrKeepInt8x16
-	OpLookupOrKeepUint8x16
 	OpLookupOrZeroInt8x16
 	OpLookupOrZeroUint8x16
 	OpMaxFloat32x4
@@ -7919,10 +7933,6 @@ const (
 	OpMulAddUint8x16
 	OpMulAddUint16x8
 	OpMulAddUint32x4
-	OpMulEvenWidenInt32x4
-	OpMulEvenWidenInt32x8
-	OpMulEvenWidenUint32x4
-	OpMulEvenWidenUint32x8
 	OpMulFloat32x4
 	OpMulFloat32x8
 	OpMulFloat32x16
@@ -7961,6 +7971,10 @@ const (
 	OpMulUint64x2
 	OpMulUint64x4
 	OpMulUint64x8
+	OpMulWidenEvenInt32x4
+	OpMulWidenEvenInt32x8
+	OpMulWidenEvenUint32x4
+	OpMulWidenEvenUint32x8
 	OpMulWidenHiInt8x16
 	OpMulWidenHiInt16x8
 	OpMulWidenHiInt32x4
@@ -8451,22 +8465,6 @@ const (
 	OpSumOf8AbsDiffUint8x16
 	OpSumOf8AbsDiffUint8x32
 	OpSumOf8AbsDiffUint8x64
-	OpTransposeEvenInt8x16
-	OpTransposeEvenInt16x8
-	OpTransposeEvenInt32x4
-	OpTransposeEvenInt64x2
-	OpTransposeEvenUint8x16
-	OpTransposeEvenUint16x8
-	OpTransposeEvenUint32x4
-	OpTransposeEvenUint64x2
-	OpTransposeOddInt8x16
-	OpTransposeOddInt16x8
-	OpTransposeOddInt32x4
-	OpTransposeOddInt64x2
-	OpTransposeOddUint8x16
-	OpTransposeOddUint16x8
-	OpTransposeOddUint32x4
-	OpTransposeOddUint64x2
 	OpTruncFloat32x4
 	OpTruncFloat32x8
 	OpTruncFloat64x2
@@ -8713,39 +8711,6 @@ const (
 	OpShiftAllRightConcatMod64Uint64x2
 	OpShiftAllRightConcatMod64Uint64x4
 	OpShiftAllRightConcatMod64Uint64x8
-	OpShiftLeftConstInt8x16
-	OpShiftLeftConstInt16x8
-	OpShiftLeftConstInt32x4
-	OpShiftLeftConstInt64x2
-	OpShiftLeftConstUint8x16
-	OpShiftLeftConstUint16x8
-	OpShiftLeftConstUint32x4
-	OpShiftLeftConstUint64x2
-	OpShiftLeftSaturatedConstInt8x16
-	OpShiftLeftSaturatedConstInt16x8
-	OpShiftLeftSaturatedConstInt32x4
-	OpShiftLeftSaturatedConstInt64x2
-	OpShiftLeftSaturatedConstUint8x16
-	OpShiftLeftSaturatedConstUint16x8
-	OpShiftLeftSaturatedConstUint32x4
-	OpShiftLeftSaturatedConstUint64x2
-	OpShiftLeftWidenLoConstInt8x16
-	OpShiftLeftWidenLoConstInt16x8
-	OpShiftLeftWidenLoConstInt32x4
-	OpShiftLeftWidenLoConstUint8x16
-	OpShiftLeftWidenLoConstUint16x8
-	OpShiftLeftWidenLoConstUint32x4
-	OpShiftRightConstInt8x16
-	OpShiftRightConstInt16x8
-	OpShiftRightConstInt32x4
-	OpShiftRightConstInt64x2
-	OpShiftRightConstUint8x16
-	OpShiftRightConstUint16x8
-	OpShiftRightConstUint32x4
-	OpShiftRightConstUint64x2
-	OpShiftRightNarrowConstUint16x8
-	OpShiftRightNarrowConstUint32x4
-	OpShiftRightNarrowConstUint64x2
 	OpTruncScaledFloat32x4
 	OpTruncScaledFloat32x8
 	OpTruncScaledFloat32x16
@@ -108305,6 +108270,86 @@ var opcodeTable = [...]opInfo{
 		generic: true,
 	},
 	{
+		name:    "ConcatEvenInt8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenInt16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenInt32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenInt64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenUint8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenUint16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenUint32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatEvenUint64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddInt8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddInt16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddInt32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddInt64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddUint8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddUint16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddUint32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "ConcatOddUint64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
 		name:    "ConcatPermuteFloat32x4",
 		argLen:  3,
 		generic: true,
@@ -108782,86 +108827,6 @@ var opcodeTable = [...]opInfo{
 	{
 		name:    "ConvertToUint64Float64x8",
 		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenInt8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenInt16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenInt32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenInt64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenUint8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenUint16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenUint32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveEvenUint64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddInt8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddInt16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddInt32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddInt64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddUint8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddUint16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddUint32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "DeinterleaveOddUint64x2",
-		argLen:  2,
 		generic: true,
 	},
 	{
@@ -109940,6 +109905,46 @@ var opcodeTable = [...]opInfo{
 		generic: true,
 	},
 	{
+		name:    "InterleaveEvenInt8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenInt16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenInt32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenInt64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenUint8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenUint16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenUint32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveEvenUint64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
 		name:    "InterleaveHiGroupedInt16x16",
 		argLen:  2,
 		generic: true,
@@ -110136,6 +110141,46 @@ var opcodeTable = [...]opInfo{
 	},
 	{
 		name:    "InterleaveLoUint64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddInt8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddInt16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddInt32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddInt64x2",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddUint8x16",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddUint16x8",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddUint32x4",
+		argLen:  2,
+		generic: true,
+	},
+	{
+		name:    "InterleaveOddUint64x2",
 		argLen:  2,
 		generic: true,
 	},
@@ -110457,16 +110502,6 @@ var opcodeTable = [...]opInfo{
 	{
 		name:    "LessUint64x8",
 		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "LookupOrKeepInt8x16",
-		argLen:  3,
-		generic: true,
-	},
-	{
-		name:    "LookupOrKeepUint8x16",
-		argLen:  3,
 		generic: true,
 	},
 	{
@@ -110960,30 +110995,6 @@ var opcodeTable = [...]opInfo{
 		generic: true,
 	},
 	{
-		name:        "MulEvenWidenInt32x4",
-		argLen:      2,
-		commutative: true,
-		generic:     true,
-	},
-	{
-		name:        "MulEvenWidenInt32x8",
-		argLen:      2,
-		commutative: true,
-		generic:     true,
-	},
-	{
-		name:        "MulEvenWidenUint32x4",
-		argLen:      2,
-		commutative: true,
-		generic:     true,
-	},
-	{
-		name:        "MulEvenWidenUint32x8",
-		argLen:      2,
-		commutative: true,
-		generic:     true,
-	},
-	{
 		name:        "MulFloat32x4",
 		argLen:      2,
 		commutative: true,
@@ -111201,6 +111212,30 @@ var opcodeTable = [...]opInfo{
 	},
 	{
 		name:        "MulUint64x8",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulWidenEvenInt32x4",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulWidenEvenInt32x8",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulWidenEvenUint32x4",
+		argLen:      2,
+		commutative: true,
+		generic:     true,
+	},
+	{
+		name:        "MulWidenEvenUint32x8",
 		argLen:      2,
 		commutative: true,
 		generic:     true,
@@ -113714,86 +113749,6 @@ var opcodeTable = [...]opInfo{
 		generic: true,
 	},
 	{
-		name:    "TransposeEvenInt8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenInt16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenInt32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenInt64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenUint8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenUint16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenUint32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeEvenUint64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddInt8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddInt16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddInt32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddInt64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddUint8x16",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddUint16x8",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddUint32x4",
-		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "TransposeOddUint64x2",
-		argLen:  2,
-		generic: true,
-	},
-	{
 		name:    "TruncFloat32x4",
 		argLen:  1,
 		generic: true,
@@ -115159,204 +115114,6 @@ var opcodeTable = [...]opInfo{
 		name:    "ShiftAllRightConcatMod64Uint64x8",
 		auxType: auxUInt8,
 		argLen:  2,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstInt8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstInt16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstInt32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstInt64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstUint8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstUint16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstUint32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftConstUint64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstInt8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstInt16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstInt32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstInt64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstUint8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstUint16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstUint32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftSaturatedConstUint64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstInt8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstInt16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstInt32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstUint8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstUint16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftLeftWidenLoConstUint32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstInt8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstInt16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstInt32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstInt64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstUint8x16",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstUint16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstUint32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightConstUint64x2",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightNarrowConstUint16x8",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightNarrowConstUint32x4",
-		auxType: auxUInt8,
-		argLen:  1,
-		generic: true,
-	},
-	{
-		name:    "ShiftRightNarrowConstUint64x2",
-		auxType: auxUInt8,
-		argLen:  1,
 		generic: true,
 	},
 	{
