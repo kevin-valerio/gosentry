@@ -595,6 +595,7 @@ var (
 	testCoverProfile   string                            // -coverprofile flag
 	testFailFast       bool                              // -failfast flag
 	testFuzz           string                            // -fuzz flag
+	testFuzzTime       string                            // -fuzztime flag
 	testUseLibAFL      bool                              // -use-libafl flag
 	testFocusOnNewCode explicitBoolFlag                  // -focus-on-new-code flag (required with -use-libafl)
 	testCatchRaces     explicitBoolFlag                  // -catch-races flag (required with -use-libafl)
@@ -654,6 +655,7 @@ var (
 
 	testKillTimeout    = 100 * 365 * 24 * time.Hour // backup alarm; defaults to about a century if no timeout is set
 	testWaitDelay      time.Duration                // how long to wait for output to close after a test binary exits; zero means unlimited
+	testLibAFLFuzzTime time.Duration                // parsed -fuzztime duration for LibAFL mode
 	testCacheExpire    time.Time                    // ignore cached test results before this time
 	testShouldFailFast atomic.Bool                  // signals pending tests to fail fast
 
@@ -697,6 +699,24 @@ func testNeedBinary() bool {
 	default:
 		return false
 	}
+}
+
+func parseLibAFLFuzzTime(s string) (time.Duration, error) {
+	if s == "" {
+		return 0, nil
+	}
+	if strings.HasSuffix(s, "x") {
+		n, err := strconv.ParseInt(s[:len(s)-1], 10, 0)
+		if err != nil || n <= 0 {
+			return 0, fmt.Errorf("invalid value %q for -fuzztime: invalid count", s)
+		}
+		return 0, fmt.Errorf("-fuzztime count form %q is not supported with -use-libafl", s)
+	}
+	d, err := time.ParseDuration(s)
+	if err != nil || d <= 0 {
+		return 0, fmt.Errorf("invalid value %q for -fuzztime: invalid duration", s)
+	}
+	return d, nil
 }
 
 // testShowPass reports whether the output for a passing test should be shown.
@@ -800,6 +820,7 @@ func runTest(ctx context.Context, cmd *base.Command, args []string) {
 	work.FindExecCmd() // initialize cached result
 
 	work.BuildInit(moduleLoader)
+	testLibAFLFuzzTime = 0
 	if testGenerateCoverage {
 		if testFuzz == "" {
 			base.Fatalf("-generate-coverage requires -fuzz")
@@ -842,6 +863,11 @@ func runTest(ctx context.Context, cmd *base.Command, args []string) {
 			if testFuzz == "" {
 				base.Fatalf("-use-libafl requires -fuzz")
 			}
+			d, err := parseLibAFLFuzzTime(testFuzzTime)
+			if err != nil {
+				base.Fatalf("%v", err)
+			}
+			testLibAFLFuzzTime = d
 			if !cfg.BuildContext.CgoEnabled {
 				base.Fatalf("-use-libafl requires cgo; enable cgo by setting CGO_ENABLED=1")
 			}
@@ -2286,6 +2312,10 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 			}
 		}()
 	}
+	cmdWaitDelay := testWaitDelay
+	if libaflOutDir != "" && testLibAFLFuzzTime > 0 && cmdWaitDelay == 0 {
+		cmdWaitDelay = 5 * time.Second
+	}
 
 	var envBase []string
 	if catchRaces || catchLeaks {
@@ -2701,6 +2731,28 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 		}()
 	}
 
+	if libaflOutDir != "" && testLibAFLFuzzTime > 0 {
+		cargoBuild := exec.CommandContext(ctx, "cargo", "build", "--release")
+		cargoBuild.Dir = cmdDir
+		cargoBuild.Env = slices.Clip(cfg.OrigEnv)
+		cargoBuild.Env = base.AppendPATH(cargoBuild.Env)
+		cargoBuild.Env = base.AppendPWD(cargoBuild.Env, cargoBuild.Dir)
+		if addToEnv != "" {
+			cargoBuild.Env = append(cargoBuild.Env, addToEnv)
+		}
+		if len(addEnv) > 0 {
+			cargoBuild.Env = append(cargoBuild.Env, addEnv...)
+		}
+		cargoBuild.Stdout = stdout
+		cargoBuild.Stderr = stdout
+		if err := cargoBuild.Run(); err != nil {
+			return err
+		}
+
+		runner := filepath.Join(cmdDir, "target", "release", "golibafl"+cfg.ExeSuffix)
+		args = append([]string{runner}, args[4:]...)
+	}
+
 	// Now we're ready to actually run the command.
 	//
 	// If the -o flag is set, or if at some point we change cmd/go to start
@@ -2719,11 +2771,11 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 		cancelSignaled = false
 		cancelSignal   os.Signal
 		cancelWith     os.Signal
+		fuzzTimeDone   atomic.Bool
 	)
 	if libaflOutDir != "" {
-		// LibAFL fuzzing uses `cargo run` which spawns the actual runner as a
-		// child process. Use SIGINT and a dedicated process group so cancellation
-		// stops the whole fuzz campaign (cargo + runner + children).
+		// LibAFL fuzzing can spawn multiple processes. Use SIGINT and a dedicated
+		// process group so cancellation stops the whole fuzz campaign.
 		cancelSignal = os.Interrupt
 	} else {
 		cancelSignal = base.SignalTrace
@@ -2784,7 +2836,7 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 			}
 			return err
 		}
-		cmd.WaitDelay = testWaitDelay
+		cmd.WaitDelay = cmdWaitDelay
 
 		var termCh chan os.Signal
 		var termDone chan struct{}
@@ -2807,9 +2859,20 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 			}()
 		}
 
+		var fuzzTimeTimer *time.Timer
+		if libaflOutDir != "" && testLibAFLFuzzTime > 0 {
+			fuzzTimeTimer = time.AfterFunc(testLibAFLFuzzTime, func() {
+				fuzzTimeDone.Store(true)
+				cancel()
+			})
+		}
+
 		base.StartSigHandlers()
 		t0 = time.Now()
 		err = cmd.Run()
+		if fuzzTimeTimer != nil {
+			fuzzTimeTimer.Stop()
+		}
 
 		if termCh != nil {
 			close(termDone)
@@ -2828,6 +2891,9 @@ func (r *runTestActor) Act(b *work.Builder, ctx context.Context, a *work.Action)
 			// command.
 			break
 		}
+	}
+	if libaflOutDir != "" && fuzzTimeDone.Load() {
+		err = nil
 	}
 	// Stop any background catch-races/catch-leaks work once the main fuzzer command exits.
 	cancel()
