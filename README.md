@@ -186,6 +186,8 @@ You can also pass an optional JSONC config file for LibAFL (including grammar fu
 ./bin/go test -fuzz=FuzzHarness --focus-on-new-code=false --catch-races=false --catch-leaks=false --libafl-config=path/to/libafl.jsonc # optional --libafl-config
 ```
 
+Use `-fuzztime=1m` to stop a LibAFL campaign after one minute.
+
 Coverage report generation from a LibAFL campaign corpus is documented in [Feature 8](#feature-8-generate-go-coverage-reports-from-fuzzing-campaign).
 
 Grammar-based fuzzing (Nautilus) is documented in [Feature 7](#feature-7-grammar-based-fuzzing-nautilus).

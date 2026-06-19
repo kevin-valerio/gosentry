@@ -19,6 +19,14 @@ This disables the runtime's automatic GOMAXPROCS updates, which can trigger an i
 
 Stop the fuzz campaign with Ctrl+C.
 
+Use `-fuzztime=<duration>` to run a bounded LibAFL campaign:
+
+```bash
+go test -fuzz=FuzzXxx -fuzztime=1m --focus-on-new-code=false --catch-races=false --catch-leaks=false
+```
+
+LibAFL mode supports the duration form, like `30s` or `1m`. The upstream count form, like `1000x`, is not supported in LibAFL mode.
+
 To opt out:
 
 ```bash

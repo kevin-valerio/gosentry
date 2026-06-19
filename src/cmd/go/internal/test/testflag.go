@@ -67,7 +67,7 @@ func init() {
 	cf.Bool("short", false, "")
 	cf.String("skip", "", "")
 	cf.DurationVar(&testTimeout, "timeout", 10*time.Minute, "") // known to cmd/dist
-	cf.String("fuzztime", "", "")
+	cf.StringVar(&testFuzzTime, "fuzztime", "", "")
 	cf.String("fuzzminimizetime", "", "")
 	cf.BoolVar(&testUseLibAFL, "use-libafl", false, "")
 	cf.Var(&testFocusOnNewCode, "focus-on-new-code", "")

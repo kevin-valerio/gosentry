@@ -44,6 +44,9 @@ jobs:
       - name: Smoke (reverse)
         run: bash misc/gosentry/tests/smoke_use_libafl_reverse.sh
 
+      - name: Smoke (fuzztime)
+        run: bash misc/gosentry/tests/smoke_use_libafl_fuzztime.sh
+
       - name: Smoke (config)
         run: bash misc/gosentry/tests/smoke_use_libafl_config.sh
 
