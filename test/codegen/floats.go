@@ -89,7 +89,6 @@ func FusedSub32_a(x, y, z float32) float32 {
 	// ppc64x:"FMSUBS "
 	// riscv64:"FMSUBS "
 	// loong64:"FMSUBF "
-	// amd64/v3:"VFMSUB231SS "
 	return x*y - z
 }
 
@@ -115,7 +114,6 @@ func FusedSub64_a(x, y, z float64) float64 {
 	// ppc64x:"FMSUB "
 	// riscv64:"FMSUBD "
 	// loong64:"FMSUBD "
-	// amd64/v3:"VFMSUB231SD "
 	return x*y - z
 }
 

@@ -13,17 +13,11 @@ import (
 )
 
 // Deprecation returns the paragraph of the doc comment that starts with the
-// conventional "Deprecation: " marker, or the end of a single-line comment
-// with the deprecation marker, as defined by https://go.dev/wiki/Deprecated.
-// Returns "" if the documented symbol is not deprecated.
-//
-// Deprecation(nil) returns the empty string.
+// conventional "Deprecation: " marker, as defined by
+// https://go.dev/wiki/Deprecated, or "" if the documented symbol is not
+// deprecated.
 func Deprecation(doc *ast.CommentGroup) string {
-	// doc.Text() is newline-terminated. For legacy reasons, this function will
-	// return as newline-terminated if is the last segment of the CommentGroup
-	// but not if it is a paragraph in the middle of the CommentGroup.
-	docText := doc.Text()
-	for p := range strings.SplitSeq(docText, "\n\n") {
+	for p := range strings.SplitSeq(doc.Text(), "\n\n") {
 		// There is still some ambiguity for deprecation message. This function
 		// only returns the paragraph introduced by "Deprecated: ". More
 		// information related to the deprecation may follow in additional
@@ -32,19 +26,6 @@ func Deprecation(doc *ast.CommentGroup) string {
 		if strings.HasPrefix(p, "Deprecated: ") {
 			return p
 		}
-	}
-
-	// We also want to support deprecation markers in line comments. Not all
-	// call sites know whether they have a line comment or the type of AST node
-	// the comment is associated with; so to best match line deprecations,
-	// the CommentGroup must meet these criteria:
-	//   * The doc.Text() is a single line.
-	//   * The comment uses the "// ..." format.
-	if doc == nil || len(doc.List) != 1 || !strings.HasPrefix(doc.List[0].Text, "//") {
-		return ""
-	}
-	if i := strings.Index(docText, "Deprecated: "); i != -1 {
-		return docText[i:]
 	}
 	return ""
 }

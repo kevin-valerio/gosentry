@@ -11,7 +11,6 @@ import (
 	"net/http/httptrace"
 	"net/textproto"
 	"strconv"
-	"strings"
 	"sync"
 
 	"golang.org/x/net/http/httpguts"
@@ -42,21 +41,15 @@ type roundTripState struct {
 func (rt *roundTripState) abort(err error) error {
 	rt.errOnce.Do(func() {
 		rt.err = err
-
-		rt.cc.mu.Lock()
-		rt.cc.active--
-		rt.cc.mu.Unlock()
-		rt.cc.maybeCallStateHook()
-
 		switch e := err.(type) {
 		case *connectionError:
 			rt.cc.abort(e)
 		case *streamError:
-			rt.st.CloseRead()
-			rt.st.Reset(uint64(e.code))
+			rt.st.stream.CloseRead()
+			rt.st.stream.Reset(uint64(e.code))
 		default:
-			rt.st.CloseRead()
-			rt.st.Reset(uint64(errH3NoError))
+			rt.st.stream.CloseRead()
+			rt.st.stream.Reset(uint64(errH3NoError))
 		}
 	})
 	return rt.err
@@ -95,20 +88,9 @@ func (rt *roundTripState) maybeCallWait100Continue() {
 
 // RoundTrip sends a request on the connection.
 func (cc *clientConn) RoundTrip(req *http.Request) (_ *http.Response, err error) {
-	cc.mu.Lock()
-	if cc.reserved > 0 {
-		cc.reserved--
-	}
-	cc.active++
-	cc.mu.Unlock()
-
 	// Each request gets its own QUIC stream.
 	st, err := newConnStream(req.Context(), cc.qconn, streamTypeRequest)
 	if err != nil {
-		cc.mu.Lock()
-		cc.active--
-		cc.mu.Unlock()
-		cc.maybeCallStateHook()
 		return nil, err
 	}
 	rt := &roundTripState{
@@ -130,7 +112,6 @@ func (cc *clientConn) RoundTrip(req *http.Request) (_ *http.Response, err error)
 	st.stream.SetReadContext(req.Context())
 	st.stream.SetWriteContext(req.Context())
 
-	addedGzip := httpcommon.IsRequestGzip(req.Method, req.Header, cc.tr.tr1.DisableCompression)
 	headers := cc.enc.encode(func(yield func(itype indexType, name, value string)) {
 		_, err = httpcommon.EncodeHeaders(req.Context(), httpcommon.EncodeHeadersParam{
 			Request: httpcommon.Request{
@@ -141,7 +122,7 @@ func (cc *clientConn) RoundTrip(req *http.Request) (_ *http.Response, err error)
 				Trailer:             req.Trailer,
 				ActualContentLength: actualContentLength(req),
 			},
-			AddGzipHeader:         addedGzip,
+			AddGzipHeader:         false, // TODO: add when appropriate
 			PeerMaxHeaderListSize: 0,
 			DefaultUserAgent:      "Go-http-client/3",
 		}, func(name, value string) {
@@ -234,13 +215,7 @@ func (cc *clientConn) RoundTrip(req *http.Request) (_ *http.Response, err error)
 				Trailer:       trailer,
 				Body:          (*transportResponseBody)(rt),
 			}
-			if addedGzip && strings.EqualFold(h.Get("Content-Encoding"), "gzip") {
-				resp.Body = &gzipReader{body: resp.Body}
-				h.Del("Content-Encoding")
-				h.Del("Content-Length")
-				resp.ContentLength = -1
-				resp.Uncompressed = true
-			}
+			// TODO: Automatic Content-Type: gzip decoding.
 			return resp, nil
 		case frameTypePushPromise:
 			if err := cc.handlePushPromise(st); err != nil {
@@ -315,7 +290,7 @@ func (b *transportResponseBody) Close() error {
 	rt.closeReqBody()
 	// Close the request stream, since we're done with the request.
 	// Reset closes the sending half of the stream.
-	rt.st.Reset(uint64(errH3NoError))
+	rt.st.stream.Reset(uint64(errH3NoError))
 	// respBody.Close is responsible for closing the receiving half.
 	err := rt.respBody.Close()
 	if err == nil {

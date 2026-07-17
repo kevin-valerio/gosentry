@@ -7,6 +7,8 @@ package typesinternal
 import (
 	"fmt"
 	"go/types"
+
+	"golang.org/x/tools/go/types/typeutil"
 )
 
 // ForEachElement calls f for type T and each type reachable from its
@@ -14,25 +16,25 @@ import (
 // type constructors; in addition, for each named type N, the type *N
 // is added to the result as it may have additional methods.
 //
-// The result of f indicates whether the caller has seen this type
-// already, so we can prune the traversal.
+// The caller must provide an initially empty set used to de-duplicate
+// identical types, potentially across multiple calls to ForEachElement.
+// (Its final value holds all the elements seen, matching the arguments
+// passed to f.)
 //
 // TODO(adonovan): share/harmonize with go/callgraph/rta.
-//
-// methodSetOf abstracts (*typeutil.MethodSetCache).MethodSet,
-// avoiding an import cycle.
-func ForEachElement(methodSetOf func(types.Type) *types.MethodSet, T types.Type, f func(types.Type) bool) {
+func ForEachElement(rtypes *typeutil.Map, msets *typeutil.MethodSetCache, T types.Type, f func(types.Type)) {
 	var visit func(T types.Type, skip bool)
 	visit = func(T types.Type, skip bool) {
 		if !skip {
-			// notify caller of element type
-			if f(T) {
-				return // duplicate; prune descent
+			if seen, _ := rtypes.Set(T, true).(bool); seen {
+				return // de-dup
 			}
+
+			f(T) // notify caller of new element type
 		}
 
 		// Recursion over signatures of each method.
-		tmset := methodSetOf(T)
+		tmset := msets.MethodSet(T)
 		for method := range tmset.Methods() {
 			sig := method.Type().(*types.Signature)
 			if sig.TypeParams() != nil {

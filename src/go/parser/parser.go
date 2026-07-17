@@ -1475,15 +1475,13 @@ func (p *parser) parseOperand() ast.Expr {
 
 	switch p.tok {
 	case token.IDENT:
-		return p.parseIdent()
+		x := p.parseIdent()
+		return x
 
 	case token.INT, token.FLOAT, token.IMAG, token.CHAR, token.STRING:
 		x := &ast.BasicLit{ValuePos: p.pos, ValueEnd: p.end(), Kind: p.tok, Value: p.lit}
 		p.next()
 		return x
-
-	case token.LBRACE:
-		return p.parseLiteralValue(nil)
 
 	case token.LPAREN:
 		lparen := p.pos
@@ -1650,16 +1648,30 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) *ast.CallExpr {
 	return &ast.CallExpr{Fun: fun, Lparen: lparen, Args: list, Ellipsis: ellipsis, Rparen: rparen}
 }
 
+func (p *parser) parseValue() ast.Expr {
+	if p.trace {
+		defer un(trace(p, "Element"))
+	}
+
+	if p.tok == token.LBRACE {
+		return p.parseLiteralValue(nil)
+	}
+
+	x := p.parseExpr()
+
+	return x
+}
+
 func (p *parser) parseElement() ast.Expr {
 	if p.trace {
 		defer un(trace(p, "Element"))
 	}
 
-	x := p.parseExpr()
+	x := p.parseValue()
 	if p.tok == token.COLON {
 		colon := p.pos
 		p.next()
-		x = &ast.KeyValueExpr{Key: x, Colon: colon, Value: p.parseExpr()}
+		x = &ast.KeyValueExpr{Key: x, Colon: colon, Value: p.parseValue()}
 	}
 
 	return x
@@ -1765,7 +1777,7 @@ func (p *parser) parsePrimaryExpr(x ast.Expr) ast.Expr {
 				p.error(t.Pos(), "cannot parenthesize type in composite literal")
 				// already progressed, no need to advance
 			}
-			x = p.parseLiteralValue(t)
+			x = p.parseLiteralValue(x)
 		default:
 			return x
 		}

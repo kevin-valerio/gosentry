@@ -168,8 +168,9 @@ func (r *SVCBResource) pack(msg []byte, _ map[string]uint16, _ int) ([]byte, err
 	if err != nil {
 		return oldMsg, &nestedError{"SVCBResource.Target", err}
 	}
+	var previousKey SVCParamKey
 	for i, param := range r.Params {
-		if i > 0 && param.Key <= r.Params[i-1].Key {
+		if i > 0 && param.Key <= previousKey {
 			return oldMsg, &nestedError{"SVCBResource.Params", errParamOutOfOrder}
 		}
 		if len(param.Value) > (1<<16)-1 {
@@ -188,10 +189,6 @@ func unpackSVCBResource(msg []byte, off int, length uint16) (SVCBResource, error
 	paramsOff := off
 	bodyEnd := off + int(length)
 
-	if bodyEnd > len(msg) {
-		return SVCBResource{}, errResourceLen
-	}
-
 	var err error
 	if r.Priority, paramsOff, err = unpackUint16(msg, paramsOff); err != nil {
 		return SVCBResource{}, &nestedError{"Priority", err}
@@ -208,7 +205,7 @@ func unpackSVCBResource(msg []byte, off int, length uint16) (SVCBResource, error
 	off = paramsOff
 	var previousKey uint16
 	for off < bodyEnd {
-		var key, size uint16
+		var key, len uint16
 		if key, off, err = unpackUint16(msg, off); err != nil {
 			return SVCBResource{}, &nestedError{"Params key", err}
 		}
@@ -217,15 +214,14 @@ func unpackSVCBResource(msg []byte, off int, length uint16) (SVCBResource, error
 			// consider the RR malformed if the SvcParamKeys are not in strictly increasing numeric order
 			return SVCBResource{}, &nestedError{"Params", errParamOutOfOrder}
 		}
-		if size, off, err = unpackUint16(msg, off); err != nil {
+		if len, off, err = unpackUint16(msg, off); err != nil {
 			return SVCBResource{}, &nestedError{"Params value length", err}
 		}
-		if off+int(size) > bodyEnd {
+		if off+int(len) > bodyEnd {
 			return SVCBResource{}, errResourceLen
 		}
-		previousKey = key
-		totalValueLen += size
-		off += int(size)
+		totalValueLen += len
+		off += int(len)
 		n++
 	}
 	if off != bodyEnd {
@@ -240,23 +236,20 @@ func unpackSVCBResource(msg []byte, off int, length uint16) (SVCBResource, error
 	off = paramsOff
 	for i := 0; i < n; i++ {
 		p := &r.Params[i]
-		var key, size uint16
+		var key, len uint16
 		if key, off, err = unpackUint16(msg, off); err != nil {
 			return SVCBResource{}, &nestedError{"param key", err}
 		}
 		p.Key = SVCParamKey(key)
-		if size, off, err = unpackUint16(msg, off); err != nil {
+		if len, off, err = unpackUint16(msg, off); err != nil {
 			return SVCBResource{}, &nestedError{"param length", err}
 		}
-		if len(msg[off:]) < int(size) {
+		if copy(valuesBuf, msg[off:off+int(len)]) != int(len) {
 			return SVCBResource{}, &nestedError{"param value", errCalcLen}
 		}
-		if copy(valuesBuf, msg[off:][:int(size)]) != int(size) {
-			return SVCBResource{}, &nestedError{"param value", errCalcLen}
-		}
-		p.Value = valuesBuf[:size:size]
-		valuesBuf = valuesBuf[size:]
-		off += int(size)
+		p.Value = valuesBuf[:len:len]
+		valuesBuf = valuesBuf[len:]
+		off += int(len)
 	}
 
 	return r, nil

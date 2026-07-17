@@ -99,14 +99,14 @@ func (c *genericConn) handleStreamError(st *stream, h streamHandler, err error) 
 	case *connectionError:
 		h.abort(err)
 	case nil:
-		st.CloseRead()
-		st.CloseWrite()
+		st.stream.CloseRead()
+		st.stream.CloseWrite()
 	case *streamError:
-		st.CloseRead()
-		st.Reset(uint64(err.code))
+		st.stream.CloseRead()
+		st.stream.Reset(uint64(err.code))
 	default:
-		st.CloseRead()
-		st.Reset(uint64(errH3InternalError))
+		st.stream.CloseRead()
+		st.stream.Reset(uint64(errH3InternalError))
 	}
 }
 

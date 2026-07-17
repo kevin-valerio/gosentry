@@ -1004,7 +1004,7 @@ func (p *parser) callStmt() *CallStmt {
 }
 
 // Operand     = Literal | OperandName | MethodExpr | "(" Expression ")" .
-// Literal     = BasicLit | [ TypeName ] CompositeLit | FunctionLit .
+// Literal     = BasicLit | CompositeLit | FunctionLit .
 // BasicLit    = int_lit | float_lit | imaginary_lit | rune_lit | string_lit .
 // OperandName = identifier | QualifiedIdent.
 func (p *parser) operand(keep_parens bool) Expr {
@@ -1018,9 +1018,6 @@ func (p *parser) operand(keep_parens bool) Expr {
 
 	case _Literal:
 		return p.oliteral()
-
-	case _Lbrace:
-		return p.compositeLit()
 
 	case _Lparen:
 		pos := p.pos()
@@ -1071,7 +1068,7 @@ func (p *parser) operand(keep_parens bool) Expr {
 		return ftyp
 
 	case _Lbrack, _Chan, _Map, _Struct, _Interface:
-		return p.type_()
+		return p.type_() // othertype
 
 	default:
 		x := p.badExpr()
@@ -1246,7 +1243,7 @@ loop:
 				p.syntaxError("cannot parenthesize type in composite literal")
 				// already progressed, no need to advance
 			}
-			n := p.compositeLit()
+			n := p.complitexpr()
 			n.Type = x
 			x = n
 
@@ -1273,10 +1270,24 @@ func isValue(x Expr) bool {
 	return false
 }
 
-// LiteralValue = "{" [ ElementList [ "," ] ] "}" .
-func (p *parser) compositeLit() *CompositeLit {
+// Element = Expression | LiteralValue .
+func (p *parser) bare_complitexpr() Expr {
 	if trace {
-		defer p.trace("compositeLit")()
+		defer p.trace("bare_complitexpr")()
+	}
+
+	if p.tok == _Lbrace {
+		// '{' start_complit braced_keyval_list '}'
+		return p.complitexpr()
+	}
+
+	return p.expr()
+}
+
+// LiteralValue = "{" [ ElementList [ "," ] ] "}" .
+func (p *parser) complitexpr() *CompositeLit {
+	if trace {
+		defer p.trace("complitexpr")()
 	}
 
 	x := new(CompositeLit)
@@ -1286,14 +1297,14 @@ func (p *parser) compositeLit() *CompositeLit {
 	p.want(_Lbrace)
 	x.Rbrace = p.list("composite literal", _Comma, _Rbrace, func() bool {
 		// value
-		e := p.expr()
+		e := p.bare_complitexpr()
 		if p.tok == _Colon {
 			// key ':' value
 			l := new(KeyValueExpr)
 			l.pos = p.pos()
 			p.next()
 			l.Key = e
-			l.Value = p.expr()
+			l.Value = p.bare_complitexpr()
 			e = l
 			x.NKeys++
 		}
