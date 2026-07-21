@@ -5598,16 +5598,16 @@ func (s *state) check(cmp *ssa.Value, fn *obj.LSym) {
 // If cmp (a bool) is false, panic using the given function with a custom message.
 func (s *state) checkWithMessage(cmp *ssa.Value, fn *obj.LSym, msg string) {
 	b := s.endBlock()
-	b.Kind = ssa.BlockIf
+	b.Kind = block.BlockIf
 	b.SetControl(cmp)
 	b.Likely = ssa.BranchLikely
-	bNext := s.f.NewBlock(ssa.BlockPlain)
+	bNext := s.f.NewBlock(block.BlockPlain)
 	line := s.peekPos()
 	pos := base.Ctxt.PosTable.Pos(line)
 	fl := funcLine{f: fn, base: pos.Base(), line: pos.Line()}
 	bPanic := s.panics[fl]
 	if bPanic == nil {
-		bPanic = s.f.NewBlock(ssa.BlockPlain)
+		bPanic = s.f.NewBlock(block.BlockPlain)
 		s.panics[fl] = bPanic
 		s.startBlock(bPanic)
 		// Create string argument for detailed panic message
@@ -6278,12 +6278,12 @@ func (s *state) intMul(n ir.Node, a, b *ssa.Value) *ssa.Value {
 
 	// Skip the division-based check when either operand is zero to avoid divide-by-zero traps.
 	b0 := s.endBlock()
-	b0.Kind = ssa.BlockIf
+	b0.Kind = block.BlockIf
 	b0.Likely = ssa.BranchUnlikely
 	b0.SetControl(eitherZero)
-	bZero := s.f.NewBlock(ssa.BlockPlain)
-	bCheck := s.f.NewBlock(ssa.BlockPlain)
-	bAfter := s.f.NewBlock(ssa.BlockPlain)
+	bZero := s.f.NewBlock(block.BlockPlain)
+	bCheck := s.f.NewBlock(block.BlockPlain)
+	bAfter := s.f.NewBlock(block.BlockPlain)
 	b0.AddEdgeTo(bZero)
 	b0.AddEdgeTo(bCheck)
 
