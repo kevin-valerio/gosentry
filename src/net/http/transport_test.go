@@ -3695,6 +3695,84 @@ func TestProxyFromEnvironmentLowerCase(t *testing.T) {
 	}
 }
 
+func TestProxyFromEnvironmentLowerCasePrecedence(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("environment variables are case-insensitive on windows")
+	}
+
+	defer func() {
+		os.Unsetenv("HTTPS_PROXY")
+		os.Unsetenv("https_proxy")
+		ResetProxyEnv()
+	}()
+
+	t.Run("proxy", func(t *testing.T) {
+		ResetProxyEnv()
+		os.Unsetenv("HTTPS_PROXY")
+		os.Unsetenv("https_proxy")
+
+		os.Setenv("HTTP_PROXY", "http://upper.proxy.tld")
+		os.Setenv("http_proxy", "http://lower.proxy.tld")
+
+		ResetCachedEnvironment()
+
+		req, _ := NewRequest("GET", "http://example.com", nil)
+		u, err := ProxyFromEnvironment(req)
+		if err != nil {
+			t.Fatalf("ProxyFromEnvironment: %v", err)
+		}
+		const want = "http://lower.proxy.tld"
+		if u == nil || u.String() != want {
+			t.Fatalf("ProxyFromEnvironment = %v; want %q", u, want)
+		}
+	})
+
+	t.Run("secure proxy", func(t *testing.T) {
+		ResetProxyEnv()
+		os.Unsetenv("HTTPS_PROXY")
+		os.Unsetenv("https_proxy")
+
+		os.Setenv("HTTPS_PROXY", "http://upper-secure.proxy.tld")
+		os.Setenv("https_proxy", "http://lower-secure.proxy.tld")
+
+		ResetCachedEnvironment()
+
+		req, _ := NewRequest("GET", "https://example.com", nil)
+		u, err := ProxyFromEnvironment(req)
+		if err != nil {
+			t.Fatalf("ProxyFromEnvironment: %v", err)
+		}
+		const want = "http://lower-secure.proxy.tld"
+		if u == nil || u.String() != want {
+			t.Fatalf("ProxyFromEnvironment = %v; want %q", u, want)
+		}
+	})
+
+	t.Run("no_proxy", func(t *testing.T) {
+		ResetProxyEnv()
+		os.Unsetenv("HTTPS_PROXY")
+		os.Unsetenv("https_proxy")
+
+		os.Setenv("HTTP_PROXY", "http://upper.proxy.tld")
+		os.Setenv("http_proxy", "http://lower.proxy.tld")
+
+		os.Setenv("NO_PROXY", "example.com")
+		os.Setenv("no_proxy", "bar.com")
+
+		ResetCachedEnvironment()
+
+		req, _ := NewRequest("GET", "http://example.com", nil)
+		u, err := ProxyFromEnvironment(req)
+		if err != nil {
+			t.Fatalf("ProxyFromEnvironment: %v", err)
+		}
+		const want = "http://lower.proxy.tld"
+		if u == nil || u.String() != want {
+			t.Fatalf("ProxyFromEnvironment = %v; want %q", u, want)
+		}
+	})
+}
+
 func TestIdleConnChannelLeak(t *testing.T) {
 	run(t, testIdleConnChannelLeak, []testMode{http1Mode}, testNotParallel)
 }
