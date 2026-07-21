@@ -42,7 +42,7 @@ func vconst(i int) int {
 	return 1000 + 128 + i
 }
 
-func testPosetOps(t *testing.T, ops []posetTestOp) {
+func testPosetOps(t *testing.T, unsigned bool, ops []posetTestOp) {
 	var v [1512]*Value
 	for i := range v {
 		v[i] = new(Value)
@@ -54,6 +54,7 @@ func testPosetOps(t *testing.T, ops []posetTestOp) {
 	}
 
 	po := newPoset()
+	po.SetUnsigned(unsigned)
 	for idx, op := range ops {
 		t.Logf("op%d%v", idx, op)
 		switch op.typ {
@@ -144,7 +145,7 @@ func testPosetOps(t *testing.T, ops []posetTestOp) {
 }
 
 func TestPoset(t *testing.T) {
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		{Ordered_Fail, 123, 124},
 
 		// Dag #0: 100<101
@@ -360,7 +361,7 @@ func TestPoset(t *testing.T) {
 
 func TestPosetStrict(t *testing.T) {
 
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		{Checkpoint, 0, 0},
 		// Build: 20!=30, 10<20<=30<40. The 20<=30 will become 20<30.
 		{SetNonEqual, 20, 30},
@@ -427,7 +428,7 @@ func TestPosetStrict(t *testing.T) {
 }
 
 func TestPosetCollapse(t *testing.T) {
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		{Checkpoint, 0, 0},
 		// Create a complex graph of <= relations among nodes between 10 and 25.
 		{SetOrderOrEqual, 10, 15},
@@ -523,7 +524,7 @@ func TestPosetCollapse(t *testing.T) {
 		{Undo, 0, 0},
 	})
 
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		{Checkpoint, 0, 0},
 		{SetOrderOrEqual, 10, 15},
 		{SetOrderOrEqual, 15, 20},
@@ -537,7 +538,7 @@ func TestPosetCollapse(t *testing.T) {
 }
 
 func TestPosetSetEqual(t *testing.T) {
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		// 10<=20<=30<40,  20<=100<110
 		{Checkpoint, 0, 0},
 		{SetOrderOrEqual, 10, 20},
@@ -611,7 +612,7 @@ func TestPosetSetEqual(t *testing.T) {
 }
 
 func TestPosetNonEqual(t *testing.T) {
-	testPosetOps(t, []posetTestOp{
+	testPosetOps(t, false, []posetTestOp{
 		{Equal_Fail, 10, 20},
 		{NonEqual_Fail, 10, 20},
 

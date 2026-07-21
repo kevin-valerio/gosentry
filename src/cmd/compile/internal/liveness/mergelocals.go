@@ -513,13 +513,8 @@ func (cs *cstate) populateIndirectUseTable(cands []*ir.Name) ([]*ir.Name, []cand
 					}
 				}
 			}
-			for idx, arg := range v.Args {
+			for _, arg := range v.Args {
 				if nc, ok := pendingUses[arg.ID]; ok {
-					if !v.AddrSinkArg(idx) {
-						// If this op may propagate the argument address to its output,
-						// then give up. See issue 80127.
-						continue
-					}
 					// We found a use of some value that took the
 					// address of nc.n. Record this inst as a
 					// potential indirect use.
