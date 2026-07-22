@@ -600,38 +600,57 @@ where
         input: &mut BytesInput,
     ) -> Result<libafl::mutators::MutationResult, Error> {
         use libafl::inputs::FromTargetBytesConverter;
-        use libafl::observers::cmp::{CmpValues, CmpValuesMetadata, CmplogBytes};
+        use libafl::observers::cmp::{CmpValues, CmpValuesMetadata};
         use libafl_bolts::AsSlice;
 
-        let mut cmp_pairs: Vec<(CmplogBytes, CmplogBytes)> =
-            if let Some(meta) = state.metadata_map().get::<CmpValuesMetadata>() {
-                meta.list
-                    .iter()
-                    .filter_map(|v| match v {
-                        CmpValues::Bytes((a, b)) => Some((*a, *b)),
-                        _ => None,
-                    })
-                    .collect()
-            } else {
-                Vec::new()
-            };
+        let mut cmp_pairs: Vec<(Vec<u8>, Vec<u8>)> = Vec::new();
+        if let Some(meta) = state.metadata_map().get::<CmpValuesMetadata>() {
+            for v in meta.list.iter() {
+                match v {
+                    CmpValues::Bytes((a, b)) => {
+                        let a_bytes = trim_cmplog_padded_bytes(a.as_slice());
+                        let b_bytes = trim_cmplog_padded_bytes(b.as_slice());
+                        if a_bytes.is_empty() || b_bytes.is_empty() {
+                            continue;
+                        }
+                        cmp_pairs.push((a_bytes.to_vec(), b_bytes.to_vec()));
+                    }
+                    CmpValues::U8((a, b, _)) => cmp_pairs.push((vec![*a], vec![*b])),
+                    CmpValues::U16((a, b, _)) => {
+                        cmp_pairs.push((a.to_le_bytes().to_vec(), b.to_le_bytes().to_vec()));
+                    }
+                    CmpValues::U32((a, b, _)) => {
+                        cmp_pairs.push((a.to_le_bytes().to_vec(), b.to_le_bytes().to_vec()));
+                    }
+                    CmpValues::U64((a, b, _)) => {
+                        cmp_pairs.push((a.to_le_bytes().to_vec(), b.to_le_bytes().to_vec()));
+                    }
+                }
+            }
+        }
         if cmp_pairs.is_empty() {
             return Ok(libafl::mutators::MutationResult::Skipped);
         }
-
-        // Prefer longer byte comparisons first (more likely to be magic strings / keywords).
-        cmp_pairs.sort_by_key(|(a, b)| {
-            let a_len = trim_cmplog_padded_bytes(a.as_slice()).len();
-            let b_len = trim_cmplog_padded_bytes(b.as_slice()).len();
-            std::cmp::max(a_len, b_len)
-        });
-        cmp_pairs.reverse();
 
         let seed_bytes = input.target_bytes();
         let seed_bytes = seed_bytes.as_ref();
         if seed_bytes.is_empty() {
             return Ok(libafl::mutators::MutationResult::Skipped);
         }
+
+        // Reduce the search space early: only keep comparisons where at least one side
+        // is a substring of the current input. This avoids spending the fixed
+        // MAX_CMP_TRIES budget on irrelevant comparisons.
+        cmp_pairs.retain(|(a, b)| {
+            find_subslice(seed_bytes, a).is_some() || find_subslice(seed_bytes, b).is_some()
+        });
+        if cmp_pairs.is_empty() {
+            return Ok(libafl::mutators::MutationResult::Skipped);
+        }
+
+        // Prefer longer comparisons first (more likely to be magic strings / keywords).
+        cmp_pairs.sort_by_key(|(a, b)| std::cmp::max(a.len(), b.len()));
+        cmp_pairs.reverse();
 
         let mut converter = libafl::inputs::NautilusBytesConverter::new(&self.ctx);
         let mut nautilus_input = match converter.convert_from_target_bytes(state, seed_bytes) {
@@ -649,26 +668,20 @@ where
 
         const MAX_CMP_TRIES: usize = 128;
         for (a, b) in cmp_pairs.iter().take(MAX_CMP_TRIES) {
-            let a_bytes: &[u8] = trim_cmplog_padded_bytes(a.as_slice());
-            let b_bytes: &[u8] = trim_cmplog_padded_bytes(b.as_slice());
-            if a_bytes.is_empty() || b_bytes.is_empty() {
-                continue;
-            }
-
             if try_apply_cmp_leaf_patch(
                 &mut nautilus_input,
                 &self.ctx.ctx,
                 &spans,
                 seed_bytes,
-                a_bytes,
-                b_bytes,
+                a,
+                b,
             ) || try_apply_cmp_leaf_patch(
                 &mut nautilus_input,
                 &self.ctx.ctx,
                 &spans,
                 seed_bytes,
-                b_bytes,
-                a_bytes,
+                b,
+                a,
             ) {
                 let mut out = Vec::new();
                 nautilus_input.unparse(&self.ctx, &mut out);
