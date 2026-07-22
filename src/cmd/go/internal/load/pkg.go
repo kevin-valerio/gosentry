@@ -630,21 +630,6 @@ func (sp *ImportStack) shorterThan(t []string) bool {
 	return false // they are equal
 }
 
-// packageCache is a lookup cache for LoadImport,
-// so that if we look up a package multiple times
-// we return the same pointer each time.
-//
-// TODO: associate the packageCache with the module loader state, so that
-// different module loaders use different caches.
-var packageCache = map[string]*Package{}
-
-// ClearPackageCache clears the package cache.
-// It cannot be used concurrently with calls to LoadImport or other functions
-// that use packageCache without synchronization.
-func ClearPackageCache() {
-	clear(packageCache)
-}
-
 // dirToImportPath returns the pseudo-import path we use for a package
 // outside the Go path. It begins with _/ and then contains the full path
 // to the directory. If the package lives in c:\home\gopher\my\pkg then
@@ -769,8 +754,9 @@ func loadImport(ld *modload.Loader, ctx context.Context, opts PackageOpts, pre *
 	}
 
 	importPath := bp.ImportPath
-	p := packageCache[importPath]
-	if p != nil {
+	var p *Package
+	if cp := ld.PackageCache()[importPath]; cp != nil {
+		p = cp.(*Package)
 		stk.Push(ImportInfo{Pkg: path, Pos: extractFirstImport(importPos)})
 		p = reusePackage(p, stk)
 		stk.Pop()
@@ -779,7 +765,7 @@ func loadImport(ld *modload.Loader, ctx context.Context, opts PackageOpts, pre *
 		p = new(Package)
 		p.Internal.Local = build.IsLocalImport(path)
 		p.ImportPath = importPath
-		packageCache[importPath] = p
+		ld.PackageCache()[importPath] = p
 
 		setCmdline(p)
 		setToolFlags(ld, p)
@@ -3583,6 +3569,27 @@ func SelectCoverPackages(s *modload.Loader, roots []*Package, match []func(*modl
 				haveMatch = true
 			}
 		}
+		// If using the race detector, silently ignore attempts to run
+		// coverage on the runtime packages. It will cause the race
+		// detector to be invoked before it has been initialized. Note
+		// the use of "regonly" instead of just ignoring the package
+		// completely-- we do this due to the requirements of the
+		// package ID numbering scheme. See the comment in
+		// $GOROOT/src/internal/coverage/pkid.go dealing with
+		// hard-coding of runtime package IDs.
+		cmode := cfg.BuildCoverMode
+		if cfg.BuildRace && p.Standard && objabi.LookupPkgSpecial(p.ImportPath).Runtime {
+			cmode = "regonly"
+		}
+
+		// If -coverpkg is in effect and for some reason we don't want
+		// coverage data for the main package, make sure that we at
+		// least process it for registration hooks.
+		if includeMain && p.Name == "main" && !haveMatch {
+			haveMatch = true
+			cmode = "regonly"
+		}
+
 		if !haveMatch {
 			continue
 		}
@@ -3611,27 +3618,6 @@ func SelectCoverPackages(s *modload.Loader, roots []*Package, match []func(*modl
 		if cfg.BuildCoverMode == "atomic" && p.Standard &&
 			(p.ImportPath == "sync/atomic" || p.ImportPath == "internal/runtime/atomic") {
 			continue
-		}
-
-		// If using the race detector, silently ignore attempts to run
-		// coverage on the runtime packages. It will cause the race
-		// detector to be invoked before it has been initialized. Note
-		// the use of "regonly" instead of just ignoring the package
-		// completely-- we do this due to the requirements of the
-		// package ID numbering scheme. See the comment in
-		// $GOROOT/src/internal/coverage/pkid.go dealing with
-		// hard-coding of runtime package IDs.
-		cmode := cfg.BuildCoverMode
-		if cfg.BuildRace && p.Standard && objabi.LookupPkgSpecial(p.ImportPath).Runtime {
-			cmode = "regonly"
-		}
-
-		// If -coverpkg is in effect and for some reason we don't want
-		// coverage data for the main package, make sure that we at
-		// least process it for registration hooks.
-		if includeMain && p.Name == "main" && !haveMatch {
-			haveMatch = true
-			cmode = "regonly"
 		}
 
 		// Mark package for instrumentation.
