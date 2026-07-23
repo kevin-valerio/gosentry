@@ -29,6 +29,9 @@ jobs:
       - name: Smoke (panic)
         run: bash misc/gosentry/tests/smoke_use_libafl_panic.sh
 
+      - name: Smoke (SIGSEGV restart)
+        run: bash misc/gosentry/tests/smoke_use_libafl_sigsegv_restart.sh
+
       - name: Smoke (overflow)
         run: bash misc/gosentry/tests/smoke_use_libafl_overflow.sh
 

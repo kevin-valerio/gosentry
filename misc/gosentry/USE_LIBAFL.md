@@ -539,6 +539,7 @@ repro:            golibafl run --input /full/path/to/.../crashes/<id>
 ```
 
 To keep fuzzing after crashes, set `"stop_all_fuzzers_on_panic": false` in the LibAFL JSONC config.
+The crashing client is restarted after target crashes, including `SIGSEGV`.
 
 Note: reproducing may require the same runtime environment variables as fuzzing (e.g. `LD_LIBRARY_PATH` for native deps).
 
