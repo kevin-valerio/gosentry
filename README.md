@@ -181,6 +181,7 @@ Stability note: in LibAFL mode, gosentry forces `GODEBUG=updatemaxprocs=0` (disa
  
 When using LibAFL (default), you must explicitly choose whether to enable git-aware scheduling: `--focus-on-new-code=true|false`. More documentation in [this Markdown file.](misc/gosentry/USE_LIBAFL.md)
 You can also pass an optional JSONC config file for LibAFL (including grammar fuzzing options), see [here.](misc/gosentry/libafl.config.jsonc)
+With `"stop_all_fuzzers_on_panic": false`, LibAFL saves each crash and restarts its client to keep fuzzing.
 
 ```bash
 ./bin/go test -fuzz=FuzzHarness --focus-on-new-code=false --catch-races=false --catch-leaks=false --libafl-config=path/to/libafl.jsonc # optional --libafl-config
