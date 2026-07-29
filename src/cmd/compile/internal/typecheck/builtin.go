@@ -295,7 +295,7 @@ func runtimeTypes() []*types.Type {
 	typs[32] = newSig(params(typs[31]), nil)
 	typs[33] = newSig(params(typs[2]), nil)
 	typs[34] = newSig(params(typs[5]), nil)
-	typs[35] = types.NewArray(typs[0], 32)
+	typs[35] = types.NewArray(typs[0], 64)
 	typs[36] = types.NewPtr(typs[35])
 	typs[37] = newSig(params(typs[36], typs[31], typs[31]), params(typs[31]))
 	typs[38] = newSig(params(typs[36], typs[31], typs[31], typs[31]), params(typs[31]))
