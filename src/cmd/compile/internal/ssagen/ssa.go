@@ -5915,8 +5915,10 @@ func (s *state) shouldCheckOverflow(typ *types.Type) bool {
 	}
 
 	// Check overflow for signed (int8, int16, int32) and unsigned (uint8, uint16, uint32, uint64) integers
-	// Exclude int64 and uintptr due to complexity and platform dependencies
-	if typ.IsInteger() {
+	// Exclude int64 and uintptr due to complexity and platform dependencies.
+	// uintptr is unsigned and 8 bytes wide, so it needs an explicit exclusion to
+	// avoid landing in the unsigned case below (same guard as shouldCheckTruncation).
+	if typ.IsInteger() && typ.Kind() != types.TUINTPTR {
 		if typ.IsSigned() {
 			switch typ.Size() {
 			case 1, 2, 4: // int8, int16, int32

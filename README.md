@@ -11,7 +11,7 @@ It comes with various fuzzing improvements and bug detectors that are not presen
 - Panic on integer overflow and detect arithmetic issues
 - Fuzz with LibAFL for state-of-the-art fuzzing techniques like path constraints solving
 - Generate/mutate inputs from a grammar to avoid useless mutations. Mutation generates valid maths operation like `X + Y - Z` can become `X / U + Z - 14` instead of `X + Yè - Z`
-- Panic on selected functions (like critcal errors loggers) and crash when it's called 
+- Panic on selected functions (like critical errors loggers) and crash when it's called 
 - Focus the fuzzer on recently changed lines AND on new coverage to target new commits mainly
 - Catch data races at fuzz-time
 - Catch Go leaks at fuzz-time
@@ -99,7 +99,7 @@ Encoding rules (high level):
 
 #### Overview
 
-This work is inspired from the previously developed [go-panikint](https://github.com/trailofbits/go-panikint). It adds overflow/underflow detection for integer arithmetic operations and (optionnally) type truncation detection for integer conversions. When overflow or truncation is detected, a panic with a detailed error message is triggered, including the specific operation type and integer types involved.
+This work is inspired from the previously developed [go-panikint](https://github.com/trailofbits/go-panikint). It adds overflow/underflow detection for integer arithmetic operations and (optionally) type truncation detection for integer conversions. When overflow or truncation is detected, a panic with a detailed error message is triggered, including the specific operation type and integer types involved.
 
 _Arithmetic operations_: Handles addition `+`, subtraction `-`, multiplication `*`, and division `/` for both signed and unsigned integer types. For signed integers, covers `int8`, `int16`, `int32`. For unsigned integers, covers `uint8`, `uint16`, `uint32`, `uint64`. The division case specifically detects the `MIN_INT / -1` overflow condition for signed integers. `int64` and `uintptr` are not checked for arithmetic operations.
 
@@ -131,7 +131,7 @@ sum2 := a + b // overflow_false_positive
 x2 := uint8(big) // truncation_false_positive
 ```
 
-Sometimes this might not work, that's because Go is in-lining the function. If `// overflow_false_poistive` isn't enough, add `//go:noinline` before the signature of your function.
+Sometimes this might not work, that's because Go is in-lining the function. If `// overflow_false_positive` isn't enough, add `//go:noinline` before the signature of your function.
 
 ## Feature 3: Panic on selected functions
 
@@ -257,7 +257,7 @@ The chart below is the evolution of the number of lines covered while fuzzing Go
 ##### Benchmark 2:
 
 The chart below is the evolution of the number of lines covered while fuzzing [go-ethereum](https://github.com/ethereum/go-ethereum) using LibAFL vs go native fuzzer.
-![BENCH2](misc/gosentry/go-ethereum-30min.png "BENCH1")
+![BENCH2](misc/gosentry/go-ethereum-30min.png "BENCH2")
 
 
 
@@ -688,7 +688,7 @@ After (or while) running a LibAFL fuzz campaign, gosentry can generate a Go cove
 ./bin/go test -fuzz=FuzzHarness --generate-coverage .
 ```
 
-This replays inputs from `<libafl output dir>/queue/` and writes over.out and cover.html 
+This replays inputs from `<libafl output dir>/queue/` and writes `cover.out` and `cover.html`.
 
 ## Trophies
 
