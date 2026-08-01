@@ -65,6 +65,9 @@ func DumpInline(fn *ir.Func) {
 
 func InitEnv() {
 	ssaDump = os.Getenv("GOSSAFUNC")
+	if ssaDump == "" {
+		ssaDump = base.Debug.Html
+	}
 	ssaDir = os.Getenv("GOSSADIR")
 	if ssaDump != "" {
 		if strings.HasSuffix(ssaDump, "+") {
