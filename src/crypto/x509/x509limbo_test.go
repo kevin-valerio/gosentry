@@ -5,7 +5,6 @@
 package x509
 
 import (
-	"crypto/fips140"
 	"crypto/internal/cryptotest"
 	"crypto/internal/cryptotest/x509limbo"
 	"encoding/json"
@@ -206,8 +205,8 @@ func TestX509Limbo(t *testing.T) {
 				t.Skipf("name constraints for DirectoryNames are not supported")
 			}
 
-			if slices.Contains(tc.Features, x509limbo.FeatureHasMldsa) && fips140.Version() == "v1.0.0" {
-				t.Skipf("ML-DSA is not available in FIPS 140-3 module v1.0.0")
+			if slices.Contains(tc.Features, x509limbo.FeatureHasMldsa) {
+				cryptotest.MustMinimumFIPS140ModuleVersion(t, "v1.26.0")
 			}
 
 			if len(tc.SignatureAlgorithms) != 0 {
@@ -268,15 +267,7 @@ func TestX509Limbo(t *testing.T) {
 
 			validationTime := time.Now()
 			if tc.ValidationTime != nil {
-				vtStr, ok := tc.ValidationTime.(string)
-				if !ok {
-					t.Fatalf("validation time is not a string: %T %v", tc.ValidationTime, tc.ValidationTime)
-				}
-				parsed, err := time.Parse(time.RFC3339, vtStr)
-				if err != nil {
-					t.Fatalf("invalid validation time %q: %v", vtStr, err)
-				}
-				validationTime = parsed
+				validationTime = *tc.ValidationTime
 			}
 
 			var ekus []ExtKeyUsage
