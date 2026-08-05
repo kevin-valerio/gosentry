@@ -8,7 +8,7 @@ if [[ -z "${bootstrap_goroot}" ]]; then
   if command -v go >/dev/null 2>&1; then
     bootstrap_goroot="$(go env GOROOT)"
   else
-    bootstrap_ver="go1.25.5"
+    bootstrap_ver="go1.26.5"
     os="$(uname -s | tr '[:upper:]' '[:lower:]')"
     arch="$(uname -m)"
     case "${arch}" in

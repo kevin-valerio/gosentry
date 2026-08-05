@@ -15,7 +15,7 @@ jobs:
       - name: Set up Go (bootstrap)
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.5"
+          go-version: "1.26.5"
 
       - name: Export GOROOT_BOOTSTRAP
         run: echo "GOROOT_BOOTSTRAP=$(go env GOROOT)" >> "$GITHUB_ENV"
@@ -78,7 +78,7 @@ jobs:
       - name: Set up Go (bootstrap)
         uses: actions/setup-go@v5
         with:
-          go-version: "1.25.5"
+          go-version: "1.26.5"
 
       - name: Export GOROOT_BOOTSTRAP
         run: echo "GOROOT_BOOTSTRAP=$(go env GOROOT)" >> "$GITHUB_ENV"
