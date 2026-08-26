@@ -179,6 +179,10 @@ var depsRules = `
 	MATH
 	< runtime/metrics;
 
+	MATH
+	< simd/internal/spec
+	< simd/internal/simdref;
+
 	MATH, unicode/utf8
 	< strconv;
 
@@ -430,6 +434,7 @@ var depsRules = `
 	golang.org/x/net/dns/dnsmessage,
 	golang.org/x/net/lif,
 	internal/godebug,
+	internal/goversion,
 	internal/nettrace,
 	internal/poll,
 	internal/routebsd,

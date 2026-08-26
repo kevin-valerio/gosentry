@@ -427,6 +427,12 @@ func init() {
 		{name: "LoweredAtomicAnd32", argLength: 3, reg: gpatomic, asm: "AMOANDW", faultOnNilArg0: true, hasSideEffects: true},
 		{name: "LoweredAtomicOr32", argLength: 3, reg: gpatomic, asm: "AMOORW", faultOnNilArg0: true, hasSideEffects: true},
 
+		// Atomic 32/64 bit AND/OR that return the old value.
+		{name: "LoweredAtomicAnd32value", argLength: 3, reg: gpxchg, resultNotInArgs: true, asm: "AMOANDW", faultOnNilArg0: true, hasSideEffects: true},
+		{name: "LoweredAtomicAnd64value", argLength: 3, reg: gpxchg, resultNotInArgs: true, asm: "AMOANDD", faultOnNilArg0: true, hasSideEffects: true},
+		{name: "LoweredAtomicOr32value", argLength: 3, reg: gpxchg, resultNotInArgs: true, asm: "AMOORW", faultOnNilArg0: true, hasSideEffects: true},
+		{name: "LoweredAtomicOr64value", argLength: 3, reg: gpxchg, resultNotInArgs: true, asm: "AMOORD", faultOnNilArg0: true, hasSideEffects: true},
+
 		// Lowering pass-throughs
 		{name: "LoweredNilCheck", argLength: 2, faultOnNilArg0: true, nilCheck: true, reg: regInfo{inputs: []regMask{gpspMask}}}, // arg0=ptr,arg1=mem, returns void.  Faults if ptr is nil.
 		{name: "LoweredGetClosurePtr", reg: regInfo{outputs: []regMask{regCtxt}}},                                                // scheduler ensures only at beginning of entry block
@@ -557,6 +563,11 @@ func init() {
 		{name: "BGEZ", controls: 1},
 		{name: "BLTZ", controls: 1},
 		{name: "BGTZ", controls: 1},
+		// JUMPTABLE implements jump tables.
+		// Aux is the symbol (an *obj.LSym) for the jump table.
+		// control[0] is the index into the jump table.
+		// control[1] is the address of the jump table (the address of the symbol stored in Aux).
+		{name: "JUMPTABLE", controls: 2, aux: "Sym"},
 	}
 
 	archs = append(archs, arch{

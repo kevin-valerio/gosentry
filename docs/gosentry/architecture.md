@@ -20,7 +20,7 @@ This is a pointer document. For user-facing usage, see `README.md`.
 - `go test` flag: `-panic-on` (`src/cmd/go/internal/test/testflag.go`)
 - Pattern validation (AST scan): `src/cmd/go/internal/test/panic_on.go`
 - Compiler flag parsing: `-panic-on-call=...` (`src/cmd/compile/internal/base/flag.go`)
-- SSA pass injecting panic calls: `src/cmd/compile/internal/ssa/panic_on_call.go`
+- SSA pass injecting panic calls: `src/cmd/compile/internal/ssacompile/panic_on_call.go`
 - Runtime helper: `runtime.panicOnCall` (`src/runtime/panic_on_call.go`)
 - Examples: `test/gosentry/examples/panic_on`, `test/gosentry/examples/panic_on_nodot`
 

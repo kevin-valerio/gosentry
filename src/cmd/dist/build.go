@@ -488,6 +488,9 @@ func isGitRepo() bool {
 	// suffice here, but that requires deviating from the infrastructure
 	// provided by `run`.
 	gitDir := chomp(run(goroot, 0, "git", "rev-parse", "--git-dir"))
+	if gitDir == "" {
+		return false
+	}
 	if !filepath.IsAbs(gitDir) {
 		gitDir = filepath.Join(goroot, gitDir)
 	}
@@ -498,6 +501,9 @@ func isGitRepo() bool {
 func isJJRepo() bool {
 	// Don't check the error from jj, similarly to what we do in isGitRepo.
 	jjDir := chomp(run(goroot, 0, "jj", "--no-pager", "--color=never", "root"))
+	if jjDir == "" {
+		return false
+	}
 	if !filepath.IsAbs(jjDir) {
 		jjDir = filepath.Join(goroot, jjDir)
 	}
@@ -1560,8 +1566,7 @@ func cmdbootstrap() {
 	os.Setenv("CC", compilerEnvLookup("CC", defaultcc, goos, goarch))
 	// Now that cmd/go is in charge of the build process, enable GOEXPERIMENT.
 	os.Setenv("GOEXPERIMENT", goexperiment)
-	// No need to enable PGO for toolchain2.
-	goInstall(toolenv(), goBootstrap, append([]string{"-pgo=off"}, toolchain...)...)
+	goInstall(toolenv(), goBootstrap, toolchain...)
 	if debug {
 		run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
 		copyfile(pathf("%s/compile2", tooldir), pathf("%s/compile", tooldir), writeExec)
@@ -1587,27 +1592,24 @@ func cmdbootstrap() {
 	if vflag > 0 {
 		xprintf("\n")
 	}
-	xprintf("Building Go toolchain3 using go_bootstrap and Go toolchain2.\n")
-	goInstall(toolenv(), goBootstrap, append([]string{"-a"}, toolchain...)...)
+	xprintf("Building Go toolchain3 and commands using go_bootstrap and Go toolchain2.\n")
+	goInstall(toolenv(), goBootstrap, append([]string{"-a"}, toolsToInstall...)...)
 	if debug {
 		run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
 		copyfile(pathf("%s/compile3", tooldir), pathf("%s/compile", tooldir), writeExec)
 	}
 
-	// Now that toolchain3 has been built from scratch, its compiler and linker
-	// should have accurate build IDs suitable for caching.
-	// Now prime the build cache with the rest of the standard library for
-	// testing, and so that the user can run 'go install std cmd' to quickly
-	// iterate on local changes without waiting for a full rebuild.
-	if _, err := os.Stat(pathf("%s/VERSION", goroot)); err == nil {
-		// If we have a VERSION file, then we use the Go version
-		// instead of build IDs as a cache key, and there is no guarantee
-		// that code hasn't changed since the last time we ran a build
-		// with this exact VERSION file (especially if someone is working
-		// on a release branch). We must not fall back to the shared build cache
-		// in this case. Leave $GOCACHE alone.
-	} else {
-		os.Setenv("GOCACHE", oldgocache)
+	// If goexperiment == "", so that the first compiler was semantically
+	// identical to the second compiler, toolchain3 has converged and can
+	// be used as the final toolchain (or the final host toolchain in the
+	// case of a cross compile). Otherwise we need to do one more build.
+	if goexperiment != "" {
+		xprintf("Building commands for GOEXPERIMENT=%s convergence for %s/%s.\n", goexperiment, goos, goarch)
+		goInstall(toolenv(), goBootstrap, append([]string{"-a"}, toolsToInstall...)...)
+		if debug {
+			run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
+			copyfile(pathf("%s/compile3goexp", tooldir), pathf("%s/compile", tooldir), writeExec)
+		}
 	}
 
 	if goos == oldgoos && goarch == oldgoarch {
@@ -1616,17 +1618,16 @@ func cmdbootstrap() {
 		if vflag > 0 {
 			xprintf("\n")
 		}
-		xprintf("Building packages and commands for %s/%s.\n", goos, goarch)
+		xprintf("Checking command staleness for %s/%s.\n", goos, goarch)
 	} else {
 		// GOOS/GOARCH does not match GOHOSTOS/GOHOSTARCH.
-		// Finish GOHOSTOS/GOHOSTARCH installation and then
+		// Check the GOHOSTOS/GOHOSTARCH build and then
 		// run GOOS/GOARCH installation.
 		timelog("build", "host toolchain")
 		if vflag > 0 {
 			xprintf("\n")
 		}
-		xprintf("Building commands for host, %s/%s.\n", goos, goarch)
-		goInstall(toolenv(), goBootstrap, toolsToInstall...)
+		xprintf("Checking command staleness for host, %s/%s.\n", goos, goarch)
 		checkNotStale(toolenv(), goBootstrap, toolsToInstall...)
 		checkNotStale(toolenv(), gorootBinGo, toolsToInstall...)
 
@@ -1639,14 +1640,11 @@ func cmdbootstrap() {
 		os.Setenv("GOOS", goos)
 		os.Setenv("GOARCH", goarch)
 		os.Setenv("CC", compilerEnvLookup("CC", defaultcc, goos, goarch))
-		xprintf("Building packages and commands for target, %s/%s.\n", goos, goarch)
+		xprintf("Building commands for target, %s/%s.\n", goos, goarch)
+		goInstall(toolenv(), goBootstrap, append([]string{"-a"}, toolsToInstall...)...)
 	}
-	goInstall(nil, goBootstrap, "std")
-	goInstall(toolenv(), goBootstrap, toolsToInstall...)
-	checkNotStale(toolenv(), goBootstrap, toolchain...)
-	checkNotStale(nil, goBootstrap, "std")
+
 	checkNotStale(toolenv(), goBootstrap, toolsToInstall...)
-	checkNotStale(nil, gorootBinGo, "std")
 	checkNotStale(toolenv(), gorootBinGo, toolsToInstall...)
 	if debug {
 		run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")

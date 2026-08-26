@@ -16,7 +16,7 @@ User-facing docs stay in `README.md`.
 - Compiler + runtime changes:
   - Compiler flags: `src/cmd/compile/internal/base/flag.go`
   - SSA instrumentation (overflow/truncation): `src/cmd/compile/internal/ssagen/ssa.go`
-  - Panic-on-call SSA pass: `src/cmd/compile/internal/ssa/panic_on_call.go`
+  - Panic-on-call SSA pass: `src/cmd/compile/internal/ssacompile/panic_on_call.go`
   - Runtime panic helpers: `src/runtime/panic.go`, `src/runtime/panic_on_call.go`
 - `go test` plumbing / flags:
   - Flags: `src/cmd/go/internal/test/testflag.go`

@@ -530,6 +530,13 @@ func readTransfer(msg any, r *bufio.Reader, maxTrailerHeaders int64) (err error)
 		t.ProtoMajor, t.ProtoMinor = 1, 1
 	}
 
+	if len(t.Header["Transfer-Encoding"]) > 0 && len(t.Header["Content-Length"]) > 0 {
+		// Transfer-Encoding supersedes Content-Length,
+		// but we should close the connection after processing the message.
+		// (RFC 9112 6.3.)
+		t.Close = true
+	}
+
 	// Transfer-Encoding: chunked, and overriding Content-Length.
 	if err := t.parseTransferEncoding(); err != nil {
 		return err
@@ -1012,6 +1019,9 @@ func (b *body) Close() error {
 			if err == io.EOF && n <= maxPostHandlerReadBytes {
 				b.earlyClose = false
 				b.sawEOF = true
+				// Reaching the end of the body is the expected
+				// outcome here, not an error to report to the caller.
+				err = nil
 			}
 		}
 	default:

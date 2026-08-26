@@ -5,6 +5,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"log"
 	"math/rand/v2"
@@ -14,8 +15,12 @@ import (
 	"strings"
 	"unicode"
 
+	"simd/archsimd/_gen/gentools"
+	"simd/archsimd/_gen/simdgen/types"
 	"simd/archsimd/_gen/unify"
 )
+
+type rawOperation = types.RawOperation
 
 type Operation struct {
 	rawOperation
@@ -38,50 +43,7 @@ type Operation struct {
 	// In is the sequence of parameters to the Go method.
 	//
 	// For masked operations, this will have the mask operand appended.
-	In []Operand
-}
-
-// rawOperation is the unifier representation of an [Operation]. It is
-// translated into a more parsed form after unifier decoding.
-type rawOperation struct {
-	Go string // Base Go method name
-
-	GoArch       string  // GOARCH for this definition
-	Asm          string  // Assembly mnemonic
-	Arrangement  *string // optional Arrangement for ARM64 SIMD operations (e.g., "4S", "2D")
-	OperandOrder *string // optional Operand order for better Go declarations
-	// Optional tag to indicate this operation is paired with special generic->machine ssa lowering rules.
-	// Should be paired with special templates in gen_simdrules.go
-	SpecialLower *string
-	// HiHalfAsm is the assembly mnemonic for the hi-half "2" variant of this operation,
-	// specified in go_arm64.yaml (e.g., "VSHRN2", "VUMULL2").
-	// When non-nil, simdgen generates the "2" variant machine op and folding rules.
-	HiHalfAsm *string
-
-	In              []Operand // Parameters
-	InVariant       []Operand // Optional parameters
-	Out             []Operand // Results
-	MemFeatures     *string   // The memory operand feature this operation supports
-	MemFeaturesData *string   // Additional data associated with MemFeatures
-	Commutative     bool      // Commutativity
-	CPUFeature      string    // CPUID/Has* feature name
-	Zeroing         *bool     // nil => use asm suffix ".Z"; false => do not use asm suffix ".Z"
-	Documentation   *string   // Documentation will be appended to the stubs comments.
-	AddDoc          *string   // Additional doc to be appended.
-	// ConstMask is a hack to reduce the size of defs the user writes for const-immediate
-	// If present, it will be copied to [In[0].Const].
-	ConstImm *string
-	// NameAndSizeCheck is used to check [BWDQ] maps to (8|16|32|64) elemBits.
-	NameAndSizeCheck *bool
-	// If non-nil, all generation in gen_simdTypes.go and gen_intrinsics will be skipped.
-	NoTypes *string
-	// If non-nil, all generation in gen_simdGenericOps and gen_simdrules will be skipped.
-	NoGenericOps *string
-	// If non-nil, this string will be attached to the machine ssa op name.  E.g. "const"
-	SSAVariant *string
-	// If true, do not emit method declarations, generic ops, or intrinsics for masked variants
-	// DO emit the architecture-specific opcodes and optimizations.
-	HideMaskMethods *bool
+	In []types.Operand
 }
 
 func (o *Operation) IsMasked() bool {
@@ -213,11 +175,11 @@ func (o *Operation) DecodeUnified(v *unify.Value) error {
 func (o *Operation) VectorWidth() int {
 	out := o.Out[0]
 	if out.Class == "vreg" {
-		return *out.Bits
+		return out.Bits.N()
 	} else if out.Class == "greg" || out.Class == "mask" {
 		for i := range o.In {
 			if o.In[i].Class == "vreg" {
-				return *o.In[i].Bits
+				return o.In[i].Bits.N()
 			}
 		}
 	}
@@ -243,13 +205,52 @@ var demotingConvertOps = map[string]bool{
 	"VPMOVWBMasked128": true, "VPMOVSWBMasked128": true, "VPMOVUSWBMasked128": true,
 }
 
+// sveArrangementLetter returns the SVE element-size arrangement letter
+// (B=8, H=16, S=32, D=64) that names an SVE machine op, or "" when the target
+// is not SVE. The letter comes from the operation's governing element width:
+// the output vreg's elemBits, else the first vreg/mask operand's elemBits.
+func sveArrangementLetter(gOp Operation) string {
+	if !CurrentArch().isSVE() {
+		return ""
+	}
+	elemBits := 0
+	pick := func(ops []types.Operand) {
+		if elemBits != 0 {
+			return
+		}
+		for i := range ops {
+			if c := ops[i].Class; (c == "vreg" || c == "mask") && ops[i].ElemBits != nil {
+				elemBits = *ops[i].ElemBits
+				return
+			}
+		}
+	}
+	pick(gOp.Out)
+	pick(gOp.In)
+	switch elemBits {
+	case 8:
+		return "B"
+	case 16:
+		return "H"
+	case 32:
+		return "S"
+	case 64:
+		return "D"
+	}
+	panic(fmt.Errorf("SVE op %s has no B/H/S/D element width (elemBits=%d)", gOp.Asm, elemBits))
+}
+
 func machineOpName(maskType maskShape, gOp Operation) string {
 	asm := gOp.Asm
 	if maskType == OneMask {
 		asm += "Masked"
 	}
 	// For ARM64, use arrangement to create distinct SSA op names
-	if gOp.Arrangement != nil && *gOp.Arrangement != "" {
+	if letter := sveArrangementLetter(gOp); letter != "" {
+		// SVE: scalable vectors have no fixed width, so distinguish machine ops
+		// by element-size arrangement letter (B/H/S/D), e.g. ZADD -> ZADDB.
+		asm += letter
+	} else if gOp.Arrangement != nil && *gOp.Arrangement != "" {
 		asm = fmt.Sprintf("%s%s", asm, *gOp.Arrangement)
 	} else {
 		asm = fmt.Sprintf("%s%d", asm, gOp.VectorWidth())
@@ -260,7 +261,7 @@ func machineOpName(maskType maskShape, gOp Operation) string {
 	if demotingConvertOps[asm] {
 		// Need to append the size of the source as well.
 		// TODO: should be "%sto%d".
-		asm = fmt.Sprintf("%s_%d", asm, *gOp.In[0].Bits)
+		asm = fmt.Sprintf("%s_%d", asm, gOp.In[0].Bits.N())
 	}
 	return asm
 }
@@ -289,6 +290,19 @@ func compareIntPointers(x, y *int) int {
 		return -1
 	}
 	return 1
+}
+
+func compareVectorSizes(x, y types.VectorSize) int {
+	if x.Scalable != y.Scalable {
+		if !x.Scalable {
+			return -1
+		}
+		return 1
+	}
+	if !x.Scalable {
+		return cmp.Compare(x.NRaw, y.NRaw)
+	}
+	return 0
 }
 
 func compareOperations(x, y Operation) int {
@@ -324,7 +338,7 @@ func compareOperations(x, y Operation) int {
 	return 0
 }
 
-func compareOperands(x, y *Operand) int {
+func compareOperands(x, y *types.Operand) int {
 	if c := compareNatural(x.Class, y.Class); c != 0 {
 		return c
 	}
@@ -337,7 +351,7 @@ func compareOperands(x, y *Operand) int {
 		if c := compareIntPointers(x.ElemBits, y.ElemBits); c != 0 {
 			return c
 		}
-		if c := compareIntPointers(x.Bits, y.Bits); c != 0 {
+		if c := compareVectorSizes(x.Bits, y.Bits); c != 0 {
 			return c
 		}
 		if c := compareIntPointers(x.ListNumber, y.ListNumber); c != 0 {
@@ -347,48 +361,22 @@ func compareOperands(x, y *Operand) int {
 	}
 }
 
-type Operand struct {
-	Class string // One of "mask", "immediate", "vreg", "greg", and "mem"
-
-	Go     *string // Go type of this operand
-	AsmPos int     // Position of this operand in the assembly instruction
-
-	Base     *string // Base Go type ("int", "uint", "float")
-	ElemBits *int    // Element bit width
-	Bits     *int    // Total vector bit width
-
-	Const *string // Optional constant value for immediates.
-	// Optional immediate arg offsets. If this field is non-nil,
-	// This operand will be an immediate operand:
-	// The compiler will right-shift the user-passed value by ImmOffset and set it as the AuxInt
-	// field of the operation.
-	ImmOffset *string
-	ImmMax    *int    // optional maximum immediate, also highest case in immediate jump table
-	Name      *string // optional name in the Go intrinsic declaration
-	Lanes     *int    // *Lanes equals Bits/ElemBits except for scalars, when *Lanes == 1
-	// TreatLikeAScalarOfSize means only the lower $TreatLikeAScalarOfSize bits of the vector
-	// is used, so at the API level we can make it just a scalar value of this size; Then we
-	// can overwrite it to a vector of the right size during intrinsics stage.
-	TreatLikeAScalarOfSize *int
-	// If non-nil, it means the [Class] field is overwritten here, right now this is used to
-	// overwrite the results of AVX2 compares to masks.
-	OverwriteClass *string
-	// If non-nil, it means the [Base] field is overwritten here. This field exist solely
-	// because Intel's XED data is inconsistent. e.g. VANDNP[SD] marks its operand int.
-	OverwriteBase *string
-	// If non-nil, it means the [ElementBits] field is overwritten. This field exist solely
-	// because Intel's XED data is inconsistent. e.g. AVX512 VPMADDUBSW marks its operand
-	// elemBits 16, which should be 8.
-	OverwriteElementBits *int
-	// For greg only, specifically VPEXTR[BW], their results are specified by Intel as 32 bits,
-	// but they really are 8/16 bits.
-	OverwriteBits *int
-	// FixedReg is the name of the fixed registers
-	FixedReg *string
-	// If non-nil, marks this vreg as a register list operand (for TBL/TBX).
-	// Currently only list number 0 is supported (we might need to teach regalloc handle register lists
-	// to support more than one register in the list).
-	ListNumber *int
+// implicitPredCount reports whether the op has an implicit-all-true governing
+// predicate input, as a count (0 or 1). An instruction has at most one governing
+// predicate — the single mask input carrying a /Z or /M qualifier (see the
+// role=="mask" operand in sve.buildOperandList) — which is a real machine-op
+// input the lowering synthesizes as all-true but which is invisible in the Go
+// API. So the generic op, intrinsic and stub size themselves by len(In) minus
+// this. Source predicates (e.g. Pn, Pm in a predicate-logical op) are ordinary
+// numbered inputs, not governing predicates, and are never counted.
+func (op Operation) implicitPredCount() int {
+	n := 0
+	for i := range op.In {
+		if op.In[i].IsImplicitAllTrue() {
+			n++
+		}
+	}
+	return n
 }
 
 // isDigit returns true if the byte is an ASCII digit.
@@ -459,7 +447,7 @@ func generatedHeader() string {
 	return CurrentArch().GeneratedHeader
 }
 
-func writeGoDefs(path string, cl unify.Closure) error {
+func writeGoDefs(cl unify.Closure) error {
 	// TODO: Merge operations with the same signature but multiple
 	// implementations (e.g., SSE vs AVX)
 	var ops []Operation
@@ -473,8 +461,6 @@ func writeGoDefs(path string, cl unify.Closure) error {
 			log.Println(def)
 			continue
 		}
-		// TODO: verify that this is safe.
-		op.sortOperand()
 		op.adjustAsm()
 		ops = append(ops, op)
 	}
@@ -525,23 +511,33 @@ func writeGoDefs(path string, cl unify.Closure) error {
 	typeMap := parseSIMDTypes(deduped)
 
 	archInfo := CurrentArch()
+	// Generated files are named by GoTypeArch: the Go API files directly, the
+	// backend files by SIMDTag. For amd64/arm64 these match the
+	// GOARCH, so those filenames are unchanged; only SVE diverges (sve/SVE) so its
+	// output sits alongside the NEON arm64 files instead of overwriting them.
+	simdTag := archInfo.SIMDTag
+	goTypeArch := archInfo.GoTypeArch
 	archLower := archInfo.Arch
-	archUpper := archInfo.ArchUpper
 
-	formatWriteAndClose(writeSIMDTypes(typeMap), path, "src/"+simdPackage+"/types_"+archLower+".go")
+	var files gentools.Files
+	defer files.FlushOrExit()
+
+	writeSIMDTypes(files.NewGoFile(simdPackage+"/types_"+goTypeArch+".go"), typeMap)
 	// TODO: Enable CPU feature generation for non-x86 architectures.
 	if archLower == "amd64" {
-		formatWriteAndClose(writeSIMDFeatures(deduped), path, "src/"+simdPackage+"/cpu.go")
+		writeSIMDFeatures(files.NewGoFile(simdPackage+"/cpu.go"), deduped)
 	}
-	f, fI := writeSIMDStubs(deduped, typeMap, archLower == "amd64")
-	formatWriteAndClose(f, path, "src/"+simdPackage+"/ops_"+archLower+".go")
-	formatWriteAndClose(fI, path, "src/"+simdPackage+"/ops_internal_"+archLower+".go")
-	formatWriteAndClose(writeSIMDIntrinsics(deduped, typeMap), path, "src/cmd/compile/internal/ssagen/simd"+archUpper+"intrinsics.go")
-	const simdGenericOpsFile = "src/cmd/compile/internal/ssa/_gen/simdgenericOps.go"
-	formatWriteAndClose(writeSIMDGenericOps(deduped, path+"/"+simdGenericOpsFile), path, simdGenericOpsFile)
-	formatWriteAndClose(writeSIMDMachineOps(deduped), path, "src/cmd/compile/internal/ssa/_gen/simd"+archUpper+"ops.go")
-	formatWriteAndClose(writeSIMDSSA(deduped), path, "src/cmd/compile/internal/"+archLower+"/simdssa.go")
-	writeAndClose(writeSIMDRules(deduped).Bytes(), path, "src/cmd/compile/internal/ssa/_gen/simd"+archUpper+".rules")
+	writeSIMDStubs(
+		files.NewGoFile(simdPackage+"/ops_"+goTypeArch+".go"),
+		files.NewGoFile(simdPackage+"/ops_internal_"+goTypeArch+".go"),
+		deduped, typeMap, archLower == "amd64",
+	)
+	writeSIMDIntrinsics(files.NewGoFile("cmd/compile/internal/ssagen/simd"+simdTag+"intrinsics.go"), deduped, typeMap)
+	const simdGenericOpsFile = "cmd/compile/internal/ssa/_gen/simdgenericOps.go"
+	writeSIMDGenericOps(files.NewGoFile(simdGenericOpsFile), deduped, genFlags.InputPath(simdGenericOpsFile))
+	writeSIMDMachineOps(files.NewGoFile("cmd/compile/internal/ssa/_gen/simd"+simdTag+"ops.go"), deduped)
+	writeSIMDSSA(files.NewGoFile("cmd/compile/internal/"+archLower+"/"+archInfo.ssaGenFile()), deduped)
+	writeSIMDRules(files.NewRawFile("cmd/compile/internal/ssa/_gen/simd"+simdTag+".rules"), deduped)
 
 	return nil
 }

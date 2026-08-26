@@ -16,14 +16,16 @@ import (
 	"time"
 )
 
-func TestTransportNewClientConnRoundTrip(t *testing.T) { run(t, testTransportNewClientConnRoundTrip, http3SkippedMode) }
+func TestTransportNewClientConnRoundTrip(t *testing.T) {
+	run(t, testTransportNewClientConnRoundTrip, http3SkippedMode)
+}
 func testTransportNewClientConnRoundTrip(t *testing.T, mode testMode) {
 	cst := newClientServerTest(t, mode, http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		io.WriteString(w, req.Host)
-	}), optFakeNet)
+	}))
 
 	scheme := mode.Scheme() // http or https
-	cc, err := cst.tr.NewClientConn(t.Context(), scheme, cst.ts.Listener.Addr().String())
+	cc, err := cst.tr.NewClientConn(t.Context(), scheme, "example.tld:"+scheme)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +72,7 @@ func newClientConnTest(t testing.TB, mode testMode, h http.HandlerFunc, opts ...
 		h = func(w http.ResponseWriter, req *http.Request) {}
 	}
 	cst := newClientServerTest(t, mode, h, opts...)
-	cc, err := cst.tr.NewClientConn(t.Context(), mode.Scheme(), cst.ts.Listener.Addr().String())
+	cc, err := cst.tr.NewClientConn(t.Context(), mode.Scheme(), "example.tld:1234")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,9 +84,11 @@ func newClientConnTest(t testing.TB, mode testMode, h http.HandlerFunc, opts ...
 }
 
 // TestClientConnReserveAll reserves every concurrency slot on a connection.
-func TestClientConnReserveAll(t *testing.T) { runSynctest(t, testClientConnReserveAll, http3SkippedMode) }
+func TestClientConnReserveAll(t *testing.T) {
+	runSynctest(t, testClientConnReserveAll, http3SkippedMode)
+}
 func testClientConnReserveAll(t *testing.T, mode testMode) {
-	cst, cc := newClientConnTest(t, mode, nil, optFakeNet, func(s *http.Server) {
+	cst, cc := newClientConnTest(t, mode, nil, func(s *http.Server) {
 		s.HTTP2 = &http.HTTP2Config{
 			MaxConcurrentStreams: 3,
 		}
@@ -121,9 +125,11 @@ func testClientConnReserveAll(t *testing.T, mode testMode) {
 
 // TestClientConnReserveParallel starts concurrent goroutines which reserve every
 // concurrency slot on a connection.
-func TestClientConnReserveParallel(t *testing.T) { runSynctest(t, testClientConnReserveParallel, http3SkippedMode) }
+func TestClientConnReserveParallel(t *testing.T) {
+	runSynctest(t, testClientConnReserveParallel, http3SkippedMode)
+}
 func testClientConnReserveParallel(t *testing.T, mode testMode) {
-	_, cc := newClientConnTest(t, mode, nil, optFakeNet, func(s *http.Server) {
+	_, cc := newClientConnTest(t, mode, nil, func(s *http.Server) {
 		s.HTTP2 = &http.HTTP2Config{
 			MaxConcurrentStreams: 3,
 		}
@@ -159,9 +165,11 @@ func testClientConnReserveParallel(t *testing.T, mode testMode) {
 }
 
 // TestClientConnReserveRelease repeatedly reserves and releases concurrency slots.
-func TestClientConnReserveRelease(t *testing.T) { runSynctest(t, testClientConnReserveRelease, http3SkippedMode) }
+func TestClientConnReserveRelease(t *testing.T) {
+	runSynctest(t, testClientConnReserveRelease, http3SkippedMode)
+}
 func testClientConnReserveRelease(t *testing.T, mode testMode) {
-	_, cc := newClientConnTest(t, mode, nil, optFakeNet, func(s *http.Server) {
+	_, cc := newClientConnTest(t, mode, nil, func(s *http.Server) {
 		s.HTTP2 = &http.HTTP2Config{
 			MaxConcurrentStreams: 3,
 		}
@@ -266,7 +274,7 @@ func TestClientConnReserveAndConsume(t *testing.T) {
 					}
 				}
 
-				_, cc := newClientConnTest(t, mode, handler, optFakeNet)
+				_, cc := newClientConnTest(t, mode, handler)
 				stateHookCalls := 0
 				cc.SetStateHook(func(cc *http.ClientConn) {
 					stateHookCalls++
@@ -331,7 +339,9 @@ func TestClientConnReserveAndConsume(t *testing.T) {
 
 // TestClientConnRoundTripBlocks verifies that RoundTrip blocks until a concurrency
 // slot is available on a connection.
-func TestClientConnRoundTripBlocks(t *testing.T) { runSynctest(t, testClientConnRoundTripBlocks, http3SkippedMode) }
+func TestClientConnRoundTripBlocks(t *testing.T) {
+	runSynctest(t, testClientConnRoundTripBlocks, http3SkippedMode)
+}
 func testClientConnRoundTripBlocks(t *testing.T, mode testMode) {
 	var handlerCalls atomic.Int64
 	requestc := make(chan struct{})
@@ -339,7 +349,7 @@ func testClientConnRoundTripBlocks(t *testing.T, mode testMode) {
 		handlerCalls.Add(1)
 		<-requestc
 	}
-	_, cc := newClientConnTest(t, mode, handler, optFakeNet, func(s *http.Server) {
+	_, cc := newClientConnTest(t, mode, handler, func(s *http.Server) {
 		s.HTTP2 = &http.HTTP2Config{
 			MaxConcurrentStreams: 3,
 		}

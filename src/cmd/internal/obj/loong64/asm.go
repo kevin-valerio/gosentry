@@ -248,6 +248,7 @@ var optab = []Optab{
 	{AVMOVQ, C_VREG, C_NONE, C_NONE, C_ROFF, C_NONE, 20, 4, 0, 0},
 	{AVMOVQ, C_ROFF, C_NONE, C_NONE, C_VREG, C_NONE, 21, 4, 0, 0},
 	{AVMOVQ, C_SOREG_12, C_NONE, C_NONE, C_ARNG, C_NONE, 42, 4, 0, 0}, // vldrepl.{b/h/w/d}
+	{AVMOVQ, C_ELEM, C_NONE, C_NONE, C_SOREG_12, C_NONE, 43, 4, 0, 0}, // vstelm.{b/h/w/d}
 	// moving data between registers
 	{AVMOVQ, C_VREG, C_NONE, C_NONE, C_VREG, C_NONE, 1, 4, 0, 0},
 	{AVMOVQ, C_REG, C_NONE, C_NONE, C_ELEM, C_NONE, 39, 4, 0, 0},  // vinsgr2vr.{b/h/w/d}
@@ -263,6 +264,7 @@ var optab = []Optab{
 	{AXVMOVQ, C_XREG, C_NONE, C_NONE, C_ROFF, C_NONE, 20, 4, 0, 0},
 	{AXVMOVQ, C_ROFF, C_NONE, C_NONE, C_XREG, C_NONE, 21, 4, 0, 0},
 	{AXVMOVQ, C_SOREG_12, C_NONE, C_NONE, C_ARNG, C_NONE, 42, 4, 0, 0}, // xvldrepl.{b/h/w/d}
+	{AXVMOVQ, C_ELEM, C_NONE, C_NONE, C_SOREG_12, C_NONE, 43, 4, 0, 0}, // xvstelm.{b/h/w/d}
 	// moving data between registers
 	{AXVMOVQ, C_XREG, C_NONE, C_NONE, C_XREG, C_NONE, 1, 4, 0, 0},
 	{AXVMOVQ, C_REG, C_NONE, C_NONE, C_ELEM, C_NONE, 39, 4, 0, 0},  // vinsgr2vr.{b/h/w/d}
@@ -649,15 +651,6 @@ func span0(ctxt *obj.Link, cursym *obj.LSym, newprog obj.ProgAlloc) {
 	// so instruction sequences that use REGTMP are unsafe to
 	// preempt asynchronously.
 	obj.MarkUnsafePoints(c.ctxt, c.cursym.Func().Text, c.newprog, c.isUnsafePoint, c.isRestartable)
-
-	// Now that we know byte offsets, we can generate jump table entries.
-	for _, jt := range cursym.Func().JumpTables {
-		for i, p := range jt.Targets {
-			// The ith jumptable entry points to the p.Pc'th
-			// byte in the function symbol s.
-			jt.Sym.WriteAddr(ctxt, int64(i)*8, 8, cursym, p.Pc)
-		}
-	}
 }
 
 // isUnsafePoint returns whether p is an unsafe point.
@@ -2774,6 +2767,38 @@ func (c *ctxt0) asmout(p *obj.Prog, o *Optab, out []uint32) {
 				}
 				o1 = OP_9IRR(v, uint32(si>>3), Rj, Vd)
 			}
+		}
+
+	case 43: // vmov Vd.<T>[index], offset(Rj)  ->  [x]vstelm.{b/h/w/d}
+		v, m := c.specialLsxMovInst(p.As, p.From.Reg, p.To.Reg, true)
+		if v == 0 {
+			c.ctxt.Diag("illegal arng type combination: %v\n", p)
+		}
+
+		vd := uint32(p.From.Reg & EXT_REG_MASK)
+		rj := uint32(p.To.Reg & EXT_REG_MASK)
+		index := uint32(p.From.Index)
+		c.checkindex(p, index, m)
+
+		si := c.regoff(&p.To)
+		switch v & 0x00F00000 {
+		case 0x00100000: // [x]vstelm.d
+			if si&7 != 0 {
+				c.ctxt.Diag("%v: offset must be a multiple of 8.\n", p)
+			}
+			o1 = v | (index << 18) | ((uint32(si>>3) & 0xff) << 10) | (rj << 5) | vd
+		case 0x00200000: // [x]vstelm.w
+			if si&3 != 0 {
+				c.ctxt.Diag("%v: offset must be a multiple of 4.\n", p)
+			}
+			o1 = v | (index << 18) | ((uint32(si>>2) & 0xff) << 10) | (rj << 5) | vd
+		case 0x00400000: // [x]vstelm.h
+			if si&1 != 0 {
+				c.ctxt.Diag("%v: offset must be a multiple of 2.\n", p)
+			}
+			o1 = v | (index << 18) | ((uint32(si>>1) & 0xff) << 10) | (rj << 5) | vd
+		case 0x00800000: // [x]vstelm.b
+			o1 = v | (index << 18) | ((uint32(si) & 0xff) << 10) | (rj << 5) | vd
 		}
 
 	case 45:

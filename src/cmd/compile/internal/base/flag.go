@@ -200,6 +200,7 @@ func ParseFlags() {
 	Debug.ZeroCopy = 1
 	Debug.RangeFuncCheck = 1
 	Debug.MergeLocals = 1
+	Debug.RewriteResults = 1
 
 	Debug.Checkptr = -1 // so we can tell whether it is set explicitly
 
@@ -385,6 +386,10 @@ func ParseFlags() {
 
 		// Fuzzing the runtime isn't interesting either.
 		Debug.Libfuzzer = 0
+	}
+
+	if len(Flag.Cfg.ImportDirs) > 0 && Flag.Cfg.PackageFile != nil {
+		log.Fatalf("cannot use both -I and -importcfg")
 	}
 
 	if Debug.Checkptr == -1 { // if not set explicitly

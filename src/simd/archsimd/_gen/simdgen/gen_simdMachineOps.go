@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"simd/archsimd/_gen/simdgen/types"
 	"sort"
 	"strings"
 )
@@ -15,7 +16,7 @@ import (
 const simdMachineOpsTmpl = `
 package main
 
-func simd{{.ArchUpper}}Ops({{.RegInfoParams}}) []opData {
+func simd{{.SIMDTag}}Ops({{.RegInfoParams}}) []opData {
 	return []opData{
 {{- range .OpsData }}
 		{name: "{{.OpName}}", argLength: {{.OpInLen}}, reg: {{.RegInfo}}, asm: "{{.Asm}}",{{if .Comm}} commutative: true,{{end}} typ: "{{.Type}}"{{if .ResultInArg0}}, resultInArg0: true{{end}}},
@@ -41,9 +42,8 @@ func simd{{.ArchUpper}}Ops({{.RegInfoParams}}) []opData {
 
 // writeSIMDMachineOps generates the machine ops and writes it to simdAMD64ops.go
 // within the specified directory.
-func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
+func writeSIMDMachineOps(buffer *bytes.Buffer, ops []Operation) {
 	t := templateOf(simdMachineOpsTmpl, "simdAMD64Ops")
-	buffer := new(bytes.Buffer)
 	buffer.WriteString(generatedHeader())
 
 	type opData struct {
@@ -56,7 +56,7 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 		ResultInArg0 bool
 	}
 	type machineOpsData struct {
-		ArchUpper         string
+		SIMDTag           string
 		RegInfoParams     string
 		OpsData           []opData
 		OpsDataImm        []opData
@@ -79,7 +79,7 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 	// Determine the "best" version of an instruction to use
 	best := make(map[string]Operation)
 	var mOpOrder []string
-	countOverrides := func(s []Operand) int {
+	countOverrides := func(s []types.Operand) int {
 		a := 0
 		for _, o := range s {
 			if o.OverwriteBase != nil {
@@ -147,7 +147,11 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 		var outType string
 		if shapeOut == OneVregOut || shapeOut == OneVregOutAtIn || shapeOut == OneVregOutScalar || gOp.Out[0].OverwriteClass != nil {
 			// If class overwrite is happening, that's not really a mask but a vreg.
-			outType = fmt.Sprintf("Vec%d", *gOp.Out[0].Bits)
+			if gOp.Out[0].Bits.Scalable {
+				outType = fmt.Sprintf("Vec%d", types.MaxVectorBits)
+			} else {
+				outType = fmt.Sprintf("Vec%d", gOp.Out[0].Bits.N())
+			}
 		} else if shapeOut == OneGregOut {
 			outType = gOp.GoType() // this is a straight Go type, not a VecNNN type
 		} else if shapeOut == OneKmaskOut {
@@ -182,7 +186,7 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 		if hasMerging && !resultInArg0 {
 			// We have to copy the slice here because the sort will be visible from other
 			// aliases when no reslicing is happening.
-			newIn := make([]Operand, len(op.In), len(op.In)+1)
+			newIn := make([]types.Operand, len(op.In), len(op.In)+1)
 			copy(newIn, op.In)
 			op.In = newIn
 			op.In = append(op.In, op.Out[0])
@@ -274,7 +278,7 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 	})
 
 	err := t.Execute(buffer, machineOpsData{
-		ArchUpper:         archInfo.ArchUpper,
+		SIMDTag:           archInfo.SIMDTag,
 		RegInfoParams:     archInfo.RegInfoParams,
 		OpsData:           opsData,
 		OpsDataImm:        opsDataImm,
@@ -286,6 +290,4 @@ func writeSIMDMachineOps(ops []Operation) *bytes.Buffer {
 	if err != nil {
 		panic(fmt.Errorf("failed to execute template: %w", err))
 	}
-
-	return buffer
 }

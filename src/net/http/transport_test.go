@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"go/token"
+	"internal/nettest"
 	"internal/nettrace"
 	"io"
 	"log"
@@ -203,7 +204,7 @@ func TestTransportConnectionCloseOnResponse(t *testing.T) {
 	run(t, testTransportConnectionCloseOnResponse, http3SkippedMode)
 }
 func testTransportConnectionCloseOnResponse(t *testing.T, mode testMode) {
-	ts := newClientServerTest(t, mode, hostPortHandler).ts
+	ts := newClientServerTest(t, mode, hostPortHandler, optRealNet).ts
 
 	connSet, testDial := makeTestDial(t)
 
@@ -260,7 +261,7 @@ func TestTransportConnectionCloseOnRequest(t *testing.T) {
 	run(t, testTransportConnectionCloseOnRequest, []testMode{http1Mode})
 }
 func testTransportConnectionCloseOnRequest(t *testing.T, mode testMode) {
-	ts := newClientServerTest(t, mode, hostPortHandler).ts
+	ts := newClientServerTest(t, mode, hostPortHandler, optRealNet).ts
 
 	connSet, testDial := makeTestDial(t)
 
@@ -397,7 +398,7 @@ func TestTransportIdleCacheKeys(t *testing.T) {
 	run(t, testTransportIdleCacheKeys, []testMode{http1Mode})
 }
 func testTransportIdleCacheKeys(t *testing.T, mode testMode) {
-	ts := newClientServerTest(t, mode, hostPortHandler).ts
+	ts := newClientServerTest(t, mode, hostPortHandler, optRealNet).ts
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
 
@@ -539,7 +540,7 @@ func testTransportNotReadToEndConnectionReuse(t *testing.T, mode testMode) {
 					w.Header().Add("Content-Length", strconv.Itoa(tc.bodyLen))
 				}
 				w.Write(slices.Repeat([]byte("a"), tc.bodyLen))
-			}), optFakeNet).ts
+			})).ts
 
 			var wg sync.WaitGroup
 			for range 10 {
@@ -604,7 +605,7 @@ func testTransportMaxPerHostIdleConns(t *testing.T, mode testMode) {
 			t.Errorf("Write: %v", err)
 			return
 		}
-	})).ts
+	}), optRealNet).ts
 
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
@@ -680,7 +681,7 @@ func testTransportMaxConnsPerHostIncludeDialInProgress(t *testing.T, mode testMo
 		if err != nil {
 			t.Fatalf("Write: %v", err)
 		}
-	})).ts
+	}), optRealNet).ts
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
 	dialStarted := make(chan struct{})
@@ -752,7 +753,7 @@ func testTransportMaxConnsPerHost(t *testing.T, mode testMode) {
 		}
 	})
 
-	ts := newClientServerTest(t, mode, h).ts
+	ts := newClientServerTest(t, mode, h, optRealNet).ts
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
 	tr.MaxConnsPerHost = 1
@@ -1513,7 +1514,7 @@ func testSOCKS5Proxy(t *testing.T, mode testMode) {
 	})
 	for _, useTLS := range []bool{false, true} {
 		t.Run(fmt.Sprintf("useTLS=%v", useTLS), func(t *testing.T) {
-			ts := newClientServerTest(t, mode, h).ts
+			ts := newClientServerTest(t, mode, h, optRealNet).ts
 			go proxy(t)
 			c := ts.Client()
 			c.Transport.(*Transport).Proxy = ProxyURL(pu)
@@ -1595,8 +1596,8 @@ func TestTransportProxy(t *testing.T) {
 					}()
 				}
 			})
-			ts := newClientServerTest(t, siteMode, h1).ts
-			proxy := newClientServerTest(t, proxyMode, h2).ts
+			ts := newClientServerTest(t, siteMode, h1, optRealNet).ts
+			proxy := newClientServerTest(t, proxyMode, h2, optRealNet).ts
 
 			pu, err := url.Parse(proxy.URL)
 			if err != nil {
@@ -1784,8 +1785,8 @@ func TestOnProxyConnectResponse(t *testing.T) {
 				}()
 			}
 		})
-		ts := newClientServerTest(t, https1Mode, h1).ts
-		proxy := newClientServerTest(t, https1Mode, h2).ts
+		ts := newClientServerTest(t, https1Mode, h1, optRealNet).ts
+		proxy := newClientServerTest(t, https1Mode, h2, optRealNet).ts
 
 		pu, err := url.Parse(proxy.URL)
 		if err != nil {
@@ -2061,7 +2062,7 @@ func testTransportGzipConcurrentCloseAndRead(t *testing.T, mode testMode) {
 		w.Header().Set("Content-Encoding", "gzip")
 		w.WriteHeader(200)
 		w.(Flusher).Flush()
-	}), optFakeNet)
+	}))
 	// Avoid response body draining in HTTP/1.
 	if mode == http1Mode {
 		cst.tr.DisableKeepAlives = true
@@ -2278,7 +2279,7 @@ func testTransportPersistConnLeakNeverIdle(t *testing.T, mode testMode) {
 			return
 		}
 		conn.Close()
-	})).ts
+	}), optRealNet).ts
 
 	var d countingDialer
 	c := ts.Client()
@@ -2477,7 +2478,7 @@ func testIssue3595(t *testing.T, mode testMode) {
 		const deniedMsg = "sorry, denied."
 		cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 			Error(w, deniedMsg, StatusUnauthorized)
-		}))
+		}), optRealNet)
 		// We need to close cst explicitly here so that in-flight server
 		// requests don't race with the call to SetRSTAvoidanceDelay for a retry.
 		defer cst.close()
@@ -2597,7 +2598,7 @@ func testIssue4191_InfiniteGetTimeout(t *testing.T, mode testMode) {
 	mux.HandleFunc("/get", func(w ResponseWriter, r *Request) {
 		io.Copy(w, neverEnding('a'))
 	})
-	ts := newClientServerTest(t, mode, mux).ts
+	ts := newClientServerTest(t, mode, mux, optRealNet).ts
 
 	connc := make(chan net.Conn, 1)
 	c := ts.Client()
@@ -2640,7 +2641,7 @@ func testIssue4191_InfiniteGetToPutTimeout(t *testing.T, mode testMode) {
 		defer r.Body.Close()
 		io.Copy(io.Discard, r.Body)
 	})
-	ts := newClientServerTest(t, mode, mux).ts
+	ts := newClientServerTest(t, mode, mux, optRealNet).ts
 	timeout := 100 * time.Millisecond
 
 	c := ts.Client()
@@ -3163,7 +3164,7 @@ func TestTransportCloseResponseBody(t *testing.T) {
 func testTransportCloseResponseBody(t *testing.T, mode testMode) {
 	writeErr := make(chan error, 1)
 	msg := []byte("young\n")
-	ts := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		for {
 			_, err := w.Write(msg)
 			if err != nil {
@@ -3172,7 +3173,11 @@ func testTransportCloseResponseBody(t *testing.T, mode testMode) {
 			}
 			w.(Flusher).Flush()
 		}
-	})).ts
+	}))
+	ts := cst.ts
+	cst.setDialNettestHook(func(nc *nettest.Conn) {
+		nc.SetReadBufferSize(1024)
+	})
 
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
@@ -3279,7 +3284,7 @@ func testTransportSocketLateBinding(t *testing.T, mode testMode) {
 	mux.HandleFunc("/bar", func(w ResponseWriter, r *Request) {
 		w.Header().Set("bar-ipport", r.RemoteAddr)
 	})
-	ts := newClientServerTest(t, mode, mux).ts
+	ts := newClientServerTest(t, mode, mux, optRealNet).ts
 
 	dialGate := make(chan bool, 1)
 	dialing := make(chan bool)
@@ -3785,7 +3790,7 @@ func testIdleConnChannelLeak(t *testing.T, mode testMode) {
 		mu.Lock()
 		n++
 		mu.Unlock()
-	})).ts
+	}), optRealNet).ts
 
 	const nReqs = 5
 	didRead := make(chan bool, nReqs)
@@ -4198,7 +4203,7 @@ func testRetryRequestsOnError(t *testing.T, mode testMode) {
 			ts := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 				logf("Handler")
 				w.Header().Set("X-Status", "ok")
-			})).ts
+			}), optRealNet).ts
 
 			var writeNumAtomic int32
 			c := ts.Client()
@@ -4327,7 +4332,7 @@ func testTransportDialTLS(t *testing.T, mode testMode) {
 		mu.Lock()
 		gotReq = true
 		mu.Unlock()
-	})).ts
+	}), optRealNet).ts
 	c := ts.Client()
 	c.Transport.(*Transport).DialTLS = func(netw, addr string) (net.Conn, error) {
 		mu.Lock()
@@ -4368,7 +4373,7 @@ func testTransportDialContext(t *testing.T, mode testMode) {
 		mu.Lock()
 		gotReq = true
 		mu.Unlock()
-	})).ts
+	}), optRealNet).ts
 	c := ts.Client()
 	c.Transport.(*Transport).DialContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
 		mu.Lock()
@@ -4412,7 +4417,7 @@ func testTransportDialTLSContext(t *testing.T, mode testMode) {
 		mu.Lock()
 		gotReq = true
 		mu.Unlock()
-	})).ts
+	}), optRealNet).ts
 	c := ts.Client()
 	c.Transport.(*Transport).DialTLSContext = func(ctx context.Context, netw, addr string) (net.Conn, error) {
 		mu.Lock()
@@ -4544,49 +4549,46 @@ func TestTransportIdleConnRacesRequest(t *testing.T) {
 	runSynctest(t, testTransportIdleConnRacesRequest, []testMode{http1Mode, http2UnencryptedMode})
 }
 func testTransportIdleConnRacesRequest(t *testing.T, mode testMode) {
-	if mode == http2UnencryptedMode {
-		t.Skip("remove skip when #70515 is fixed")
-	}
 	timeout := 1 * time.Millisecond
 	trFunc := func(tr *Transport) {
 		tr.IdleConnTimeout = timeout
 	}
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
-	}), trFunc, optFakeNet)
-	cst.li.trackConns = true
+	}), trFunc)
+
+	dialsBlocked := make(chan struct{})
+	closeBlocked := make(chan struct{})
+
+	dialContext := cst.tr.DialContext
+	cst.tr.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+		<-dialsBlocked
+		c, err := dialContext(ctx, network, address)
+		if err != nil {
+			return nil, err
+		}
+		return &blockCloseConn{closeBlocked, c}, nil
+	}
 
 	// We want to put a connection into the pool which has never had a request made on it.
 	//
 	// Make a request and cancel it before the dial completes.
 	// Then complete the dial.
-	dialc := make(chan struct{})
-	cst.li.onDial = func() {
-		<-dialc
-	}
-	closec := make(chan struct{})
-	cst.li.onClose = func(*fakeNetConn) {
-		<-closec
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	req1c := make(chan error)
+	ctx, cancel := context.WithCancel(t.Context())
 	go func() {
 		req, _ := NewRequestWithContext(ctx, "GET", cst.ts.URL, nil)
 		resp, err := cst.c.Do(req)
 		if err == nil {
+			t.Errorf("expected request to fail, but it succeeded")
 			resp.Body.Close()
 		}
-		req1c <- err
 	}()
 	// Wait for the connection attempt to start.
 	synctest.Wait()
 	// Cancel the request.
 	cancel()
 	synctest.Wait()
-	if err := <-req1c; err == nil {
-		t.Fatal("expected request to fail, but it succeeded")
-	}
 	// Unblock the dial, placing a new, unused connection into the Transport's pool.
-	close(dialc)
+	close(dialsBlocked)
 
 	// We want IdleConnTimeout to race with a new request.
 	//
@@ -4596,23 +4598,30 @@ func testTransportIdleConnRacesRequest(t *testing.T, mode testMode) {
 	//
 	// First: Wait for IdleConnTimeout. The net.Conn.Close blocks.
 	synctest.Wait()
-	time.Sleep(timeout)
-	synctest.Wait()
+	synctest.Sleep(timeout)
 	// Make a request, which will use a new connection (since the existing one is closing).
-	req2c := make(chan error)
 	go func() {
 		resp, err := cst.c.Get(cst.ts.URL)
-		if err == nil {
-			resp.Body.Close()
+		if err != nil {
+			t.Errorf("expected second request to succeed, but it failed: %v", err)
+			return
 		}
-		req2c <- err
+		resp.Body.Close()
 	}()
 	// Don't synctest.Wait here: The HTTP/1 transport closes the idle conn
 	// with a mutex held, and we'll end up in a deadlock.
-	close(closec)
-	if err := <-req2c; err != nil {
-		t.Fatalf("Get: %v", err)
-	}
+	close(closeBlocked)
+	synctest.Wait()
+}
+
+type blockCloseConn struct {
+	closeBlocked chan struct{}
+	net.Conn
+}
+
+func (c *blockCloseConn) Close() error {
+	<-c.closeBlocked
+	return c.Conn.Close()
 }
 
 func TestTransportRemovesConnsAfterIdle(t *testing.T) {
@@ -4631,7 +4640,7 @@ func testTransportRemovesConnsAfterIdle(t *testing.T, mode testMode) {
 	}
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		w.Header().Set("X-Addr", r.RemoteAddr)
-	}), trFunc, optFakeNet)
+	}), trFunc)
 
 	// makeRequest returns the local address a request was made from
 	// (unique for each connection).
@@ -4675,8 +4684,12 @@ func testTransportRemovesConnsAfterBroken(t *testing.T, mode testMode) {
 	}
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		w.Header().Set("X-Addr", r.RemoteAddr)
-	}), trFunc, optFakeNet)
-	cst.li.trackConns = true
+	}), trFunc)
+
+	var conns []*nettest.Conn
+	cst.setDialNettestHook(func(c *nettest.Conn) {
+		conns = append(conns, c)
+	})
 
 	// makeRequest returns the local address a request was made from
 	// (unique for each connection).
@@ -4697,7 +4710,7 @@ func testTransportRemovesConnsAfterBroken(t *testing.T, mode testMode) {
 
 	// The connection breaks.
 	synctest.Wait()
-	cst.li.conns[0].peer.Close()
+	conns[0].Peer().Close()
 	synctest.Wait()
 	addr3 := makeRequest()
 	if addr1 == addr3 {
@@ -4819,6 +4832,7 @@ func testConnClosedBeforeRequestIsWritten(t *testing.T, mode testMode) {
 				}, nil
 			}
 		},
+		optRealNet,
 	).ts
 	// Set a short delay in RoundTrip to give the persistConn time to notice
 	// the connection is broken. We want to exercise the path where writeLoop exits
@@ -5360,7 +5374,7 @@ func testTransportEventTrace(t *testing.T, mode testMode, noHooks bool) {
 		if tr.TLSClientConfig != nil {
 			tr.TLSClientConfig.InsecureSkipVerify = true
 		}
-	})
+	}, optRealNet)
 	defer cst.close()
 
 	cst.tr.ExpectContinueTimeout = 1 * time.Second
@@ -5543,7 +5557,7 @@ func testTransportEventTraceTLSVerify(t *testing.T, mode testMode) {
 			logf("%s", p)
 			return len(p), nil
 		}), "", 0)
-	}).ts
+	}, optRealNet).ts
 
 	certpool := x509.NewCertPool()
 	certpool.AddCert(ts.Certificate())
@@ -5676,7 +5690,7 @@ func TestTLSHandshakeTrace(t *testing.T) {
 	run(t, testTLSHandshakeTrace, []testMode{https1Mode, http2Mode})
 }
 func testTLSHandshakeTrace(t *testing.T, mode testMode) {
-	ts := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {})).ts
+	ts := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {}), optRealNet).ts
 
 	var mu sync.Mutex
 	var start, done bool
@@ -5724,7 +5738,7 @@ func TestTransportMaxIdleConns(t *testing.T) {
 func testTransportMaxIdleConns(t *testing.T, mode testMode) {
 	ts := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		// No body for convenience.
-	})).ts
+	}), optRealNet).ts
 	c := ts.Client()
 	tr := c.Transport.(*Transport)
 	tr.MaxIdleConns = 4
@@ -5870,7 +5884,7 @@ func TestIdleConnH2Crash(t *testing.T) { run(t, testIdleConnH2Crash, []testMode{
 func testIdleConnH2Crash(t *testing.T, mode testMode) {
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		// nothing
-	}))
+	}), optRealNet)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -5980,7 +5994,7 @@ func testTransportIDNA(t *testing.T, mode testMode) {
 		if tr.TLSClientConfig != nil {
 			tr.TLSClientConfig.InsecureSkipVerify = true
 		}
-	})
+	}, optRealNet)
 
 	ip, port, err := net.SplitHostPort(cst.ts.Listener.Addr().String())
 	if err != nil {
@@ -6742,6 +6756,7 @@ func testTransportRequestWriteRoundTrip(t *testing.T, mode testMode) {
 					w.WriteHeader(200)
 				}),
 				trFunc,
+				optRealNet,
 			)
 
 			req, err := NewRequest("PUT", cst.ts.URL, r)
@@ -7059,7 +7074,7 @@ func TestDontCacheBrokenHTTP2Conn(t *testing.T) {
 	run(t, testDontCacheBrokenHTTP2Conn, []testMode{http2Mode})
 }
 func testDontCacheBrokenHTTP2Conn(t *testing.T, mode testMode) {
-	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {}), optQuietLog)
+	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {}), optQuietLog, optRealNet)
 
 	var brokenState brokenState
 

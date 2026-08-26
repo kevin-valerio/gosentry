@@ -526,37 +526,6 @@ func (p *pgoActor) Act(b *Builder, ctx context.Context, a *Action) error {
 	return nil
 }
 
-type checkCacheProvider struct {
-	need uint32 // What work do successive actions within this package's build need to do? Combination of need bits used in build actions.
-}
-
-// The actor to check the cache to determine what work needs to be done for the action.
-// It checks the cache and sets the need bits depending on the build mode and what's available
-// in the cache, so the cover and compile actions know what to do.
-// Currently, we don't cache the outputs of the individual actions composing the build
-// for a single package (such as the output of the cover actor) separately from the
-// output of the final build, but if we start doing so, we could schedule the run cgo
-// and cgo compile actions earlier because they wouldn't depend on the builds of the
-// dependencies of the package they belong to.
-type checkCacheActor struct {
-	buildAction *Action
-}
-
-func (cca *checkCacheActor) Act(b *Builder, ctx context.Context, a *Action) error {
-	buildAction := cca.buildAction
-	if buildAction.Mode == "build-install" {
-		// (*Builder).installAction can rewrite the build action with its install action,
-		// making the true build action its dependency. Fetch the build action in that case.
-		buildAction = buildAction.Deps[0]
-	}
-	pr, err := b.checkCacheForBuild(a, buildAction)
-	if err != nil {
-		return err
-	}
-	a.Provider = pr
-	return nil
-}
-
 type coverProvider struct {
 	// name of static metadata file fragment emitted by the cover
 	// tool as part of the package cover action, for selected
@@ -575,17 +544,6 @@ type runCgoActor struct {
 }
 
 func (c runCgoActor) Act(b *Builder, ctx context.Context, a *Action) error {
-	var cacheProvider *checkCacheProvider
-	for _, a1 := range a.Deps {
-		if pr, ok := a1.Provider.(*checkCacheProvider); ok {
-			cacheProvider = pr
-			break
-		}
-	}
-	need := cacheProvider.need
-	if need == 0 {
-		return nil
-	}
 	return b.runCgo(ctx, a)
 }
 
@@ -594,20 +552,32 @@ type cgoCompileActor struct {
 
 	compileFunc  func(*Action, string, string, []string, string) error
 	getFlagsFunc func(*runCgoProvider) []string
-
-	flags *[]string
 }
 
 func (c cgoCompileActor) Act(b *Builder, ctx context.Context, a *Action) error {
 	pr, ok := a.Deps[0].Provider.(*runCgoProvider)
 	if !ok {
-		return nil // cgo was not needed. do nothing.
+		base.Fatalf("internal error: missing runCgoProvider")
 	}
 	a.nonGoOverlay = pr.nonGoOverlay
-	buildAction := a.triggers[0].triggers[0] // cgo compile -> cgo collect -> build
 
-	a.actionID = cache.Subkey(buildAction.actionID, "cgo compile "+c.file) // buildAction's action id was computed by the check cache action.
-	return c.compileFunc(a, a.Objdir, a.Target, c.getFlagsFunc(pr), c.file)
+	a.actionID = b.cgoCompileActionID(a, c.file, c.getFlagsFunc(pr))
+	targetBase := filepath.Base(a.Target)
+	if err := b.loadCachedObjdirFile(a, cache.Default(), targetBase); err == nil {
+		a.built = a.Target
+		return nil
+	}
+	defer b.flushOutput(a)
+
+	if err := c.compileFunc(a, a.Objdir, a.Target, c.getFlagsFunc(pr), c.file); err != nil {
+		return err
+	}
+
+	if !cfg.BuildN {
+		b.cacheObjdirFile(a, cache.Default(), targetBase)
+	}
+
+	return nil
 }
 
 // CompileAction returns the action for compiling and possibly installing
@@ -692,25 +662,14 @@ func (b *Builder) CompileAction(mode, depMode BuildMode, p *load.Package) *Actio
 			a.Deps = append(a.Deps, coverAction)
 		}
 
-		// Create a cache action.
-		cacheAction := &Action{
-			Mode:    "build check cache",
-			Package: p,
-			Actor:   &checkCacheActor{buildAction: a},
-			Objdir:  a.Objdir,
-			Deps:    a.Deps, // Need outputs of dependency build actions to generate action id.
-		}
-		a.Deps = append(a.Deps, cacheAction)
-
-		// Create actions to run swig and cgo if needed. These actions always run in the
-		// same go build invocation as the build action and their actions are not cached
-		// separately, so they can use the same objdir.
+		// Create actions to run swig and cgo if needed. These actions
+		// cache their outputs independently under their own action IDs.
 		if p.UsesCgo() || p.UsesSwig() {
-			deps := []*Action{cacheAction}
+			var cgoDeps []*Action
 			if coverAction != nil {
-				deps = append(deps, coverAction)
+				cgoDeps = append(cgoDeps, coverAction)
 			}
-			a.Deps = append(a.Deps, b.cgoAction(p, a.Objdir, deps, coverAction != nil))
+			a.Deps = append(a.Deps, b.cgoAction(p, a.Objdir, cgoDeps, coverAction != nil))
 		}
 
 		return a
@@ -808,22 +767,30 @@ func (b *Builder) cgoAction(p *load.Package, objdir string, deps []*Action, hasC
 			sfiles = p.SFiles
 		}
 		for _, f := range sfiles {
-			collectDeps = append(collectDeps, compileAction(f, (*runCgoProvider).cflags, b.gas))
+			collectDeps = append(collectDeps, compileAction(mkAbs(p.Dir, f), (*runCgoProvider).cflags, b.gas))
 		}
 
-		// Add compile actions for C files in the package, M files, and those generated by swig.
-		for _, f := range slices.Concat(p.CFiles, p.MFiles, swigC) {
+		// Add compile actions for C files in the package and M files.
+		for _, f := range slices.Concat(p.CFiles, p.MFiles) {
+			collectDeps = append(collectDeps, compileAction(filepath.Join(p.Dir, f), (*runCgoProvider).cflags, b.gcc))
+		}
+		// Add compile actions for C files generated by swig.
+		for _, f := range swigC {
 			collectDeps = append(collectDeps, compileAction(f, (*runCgoProvider).cflags, b.gcc))
 		}
 
-		// Add compile actions for C++ files in the package, and those generated by swig.
-		for _, f := range slices.Concat(p.CXXFiles, swigCXX) {
+		// Add compile actions for C++ files in the package.
+		for _, f := range p.CXXFiles {
+			collectDeps = append(collectDeps, compileAction(filepath.Join(p.Dir, f), (*runCgoProvider).cxxflags, b.gxx))
+		}
+		// Add compile actions for C++ files generated by swig.
+		for _, f := range swigCXX {
 			collectDeps = append(collectDeps, compileAction(f, (*runCgoProvider).cxxflags, b.gxx))
 		}
 
 		// Add compile actions for Fortran files in the package.
 		for _, f := range p.FFiles {
-			collectDeps = append(collectDeps, compileAction(f, (*runCgoProvider).fflags, b.gfortran))
+			collectDeps = append(collectDeps, compileAction(filepath.Join(p.Dir, f), (*runCgoProvider).fflags, b.gfortran))
 		}
 
 		// Add a single convenience action that does nothing to join the previous action,

@@ -105,6 +105,7 @@ const (
 	BlockMIPSGEZ
 	BlockMIPSFPT
 	BlockMIPSFPF
+	BlockMIPSJUMPTABLE
 
 	BlockMIPS64EQ
 	BlockMIPS64NE
@@ -114,6 +115,7 @@ const (
 	BlockMIPS64GEZ
 	BlockMIPS64FPT
 	BlockMIPS64FPF
+	BlockMIPS64JUMPTABLE
 
 	BlockPPC64EQ
 	BlockPPC64NE
@@ -138,6 +140,7 @@ const (
 	BlockRISCV64BGEZ
 	BlockRISCV64BLTZ
 	BlockRISCV64BGTZ
+	BlockRISCV64JUMPTABLE
 
 	BlockS390XBRC
 	BlockS390XCRJ
@@ -254,23 +257,25 @@ var blockString = [...]string{
 	BlockLOONG64BLTU:      "BLTU",
 	BlockLOONG64JUMPTABLE: "JUMPTABLE",
 
-	BlockMIPSEQ:  "EQ",
-	BlockMIPSNE:  "NE",
-	BlockMIPSLTZ: "LTZ",
-	BlockMIPSLEZ: "LEZ",
-	BlockMIPSGTZ: "GTZ",
-	BlockMIPSGEZ: "GEZ",
-	BlockMIPSFPT: "FPT",
-	BlockMIPSFPF: "FPF",
+	BlockMIPSEQ:        "EQ",
+	BlockMIPSNE:        "NE",
+	BlockMIPSLTZ:       "LTZ",
+	BlockMIPSLEZ:       "LEZ",
+	BlockMIPSGTZ:       "GTZ",
+	BlockMIPSGEZ:       "GEZ",
+	BlockMIPSFPT:       "FPT",
+	BlockMIPSFPF:       "FPF",
+	BlockMIPSJUMPTABLE: "JUMPTABLE",
 
-	BlockMIPS64EQ:  "EQ",
-	BlockMIPS64NE:  "NE",
-	BlockMIPS64LTZ: "LTZ",
-	BlockMIPS64LEZ: "LEZ",
-	BlockMIPS64GTZ: "GTZ",
-	BlockMIPS64GEZ: "GEZ",
-	BlockMIPS64FPT: "FPT",
-	BlockMIPS64FPF: "FPF",
+	BlockMIPS64EQ:        "EQ",
+	BlockMIPS64NE:        "NE",
+	BlockMIPS64LTZ:       "LTZ",
+	BlockMIPS64LEZ:       "LEZ",
+	BlockMIPS64GTZ:       "GTZ",
+	BlockMIPS64GEZ:       "GEZ",
+	BlockMIPS64FPT:       "FPT",
+	BlockMIPS64FPF:       "FPF",
+	BlockMIPS64JUMPTABLE: "JUMPTABLE",
 
 	BlockPPC64EQ:  "EQ",
 	BlockPPC64NE:  "NE",
@@ -283,18 +288,19 @@ var blockString = [...]string{
 	BlockPPC64FGT: "FGT",
 	BlockPPC64FGE: "FGE",
 
-	BlockRISCV64BEQ:  "BEQ",
-	BlockRISCV64BNE:  "BNE",
-	BlockRISCV64BLT:  "BLT",
-	BlockRISCV64BGE:  "BGE",
-	BlockRISCV64BLTU: "BLTU",
-	BlockRISCV64BGEU: "BGEU",
-	BlockRISCV64BEQZ: "BEQZ",
-	BlockRISCV64BNEZ: "BNEZ",
-	BlockRISCV64BLEZ: "BLEZ",
-	BlockRISCV64BGEZ: "BGEZ",
-	BlockRISCV64BLTZ: "BLTZ",
-	BlockRISCV64BGTZ: "BGTZ",
+	BlockRISCV64BEQ:       "BEQ",
+	BlockRISCV64BNE:       "BNE",
+	BlockRISCV64BLT:       "BLT",
+	BlockRISCV64BGE:       "BGE",
+	BlockRISCV64BLTU:      "BLTU",
+	BlockRISCV64BGEU:      "BGEU",
+	BlockRISCV64BEQZ:      "BEQZ",
+	BlockRISCV64BNEZ:      "BNEZ",
+	BlockRISCV64BLEZ:      "BLEZ",
+	BlockRISCV64BGEZ:      "BGEZ",
+	BlockRISCV64BLTZ:      "BLTZ",
+	BlockRISCV64BGTZ:      "BGTZ",
+	BlockRISCV64JUMPTABLE: "JUMPTABLE",
 
 	BlockS390XBRC:   "BRC",
 	BlockS390XCRJ:   "CRJ",

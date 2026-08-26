@@ -1,0 +1,13 @@
+!sum
+# Greater — signed integer compare. ZCMPGT is predicated-only: there is no
+# unpredicated variant, so its first operand is a governing predicate.
+- go: Greater
+  asm: "ZCMPGT"
+  in:
+  - &int
+    go: $t
+    base: int
+  - *int
+  - class: mask # governing predicate
+  out:
+  - class: mask

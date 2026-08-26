@@ -31,6 +31,11 @@ var (
 	sinkU64 archsimd.Uint64x2
 	sinkF32 archsimd.Float32x4
 	sinkF64 archsimd.Float64x2
+
+	sinkM8  archsimd.Mask8x16
+	sinkM16 archsimd.Mask16x8
+	sinkM32 archsimd.Mask32x4
+	sinkM64 archsimd.Mask64x2
 )
 
 func broadcastConstImmFold(k int) {
@@ -95,6 +100,19 @@ func getHiFloat64(x archsimd.Float64x2) {
 	sinkF64 = x.HiToLo()
 }
 
+// does x.And(y).Equal(zero) peephole to the expected cmtst?
+func cmtst(x8, y8 archsimd.Uint8x16, x16, y16 archsimd.Uint16x8,
+	x32, y32 archsimd.Uint32x4, x64, y64 archsimd.Uint64x2) {
+	var z8 archsimd.Uint8x16
+	var z16 archsimd.Uint16x8
+	var z32 archsimd.Uint32x4
+	var z64 archsimd.Uint64x2
+	sinkM8 = x8.And(y8).Equal(z8).Not()     // arm64: `VCMTST V[0-9]+.B16, V[0-9]+.B16, V[0-9]+.B16`
+	sinkM16 = x16.And(y16).Equal(z16).Not() // arm64: `VCMTST V[0-9]+.H8, V[0-9]+.H8, V[0-9]+.H8`
+	sinkM32 = x32.And(y32).Equal(z32).Not() // arm64: `VCMTST V[0-9]+.S4, V[0-9]+.S4, V[0-9]+.S4`
+	sinkM64 = x64.And(y64).Equal(z64).Not() // arm64: `VCMTST V[0-9]+.D2, V[0-9]+.D2, V[0-9]+.D2`
+}
+
 func foldGetHiSetHiMuls(a, b archsimd.Uint16x8) archsimd.Uint16x8 {
 	wLo := a.MulWidenLo(b)                     // arm64: `VUMULL V0.H4, V1.H4, V[0-9].S4`
 	wHi := a.HiToLo().MulWidenLo(b.HiToLo())   // arm64: `VUMULL2 V1.H8, V0.H8, V[0-9].S4` -`VDUP`
@@ -135,4 +153,11 @@ func loToHiUint32Vec(x, lo archsimd.Uint32x4) archsimd.Uint32x4 {
 // avoiding a round-trip through a GP register.
 func loToHiUint16Vec(x, lo archsimd.Uint16x8) archsimd.Uint16x8 {
 	return x.ReshapeToUint64s().BitsToFloat64().SetElem(1, lo.ReshapeToUint64s().BitsToFloat64().GetElem(0)).ToBits().ReshapeToUint16s()
+}
+
+// The zero value of a mask is an all-false predicate.
+func sveZeroMask() archsimd.Mask8s {
+	// arm64:`PPFALSE` -`ZDUP`
+	var m archsimd.Mask8s
+	return m
 }

@@ -6,7 +6,7 @@
 
 - Compiler flags: `src/cmd/compile/internal/base/flag.go`
 - Overflow/truncation instrumentation: `src/cmd/compile/internal/ssagen/ssa.go`
-- Panic-on-call instrumentation: `src/cmd/compile/internal/ssa/panic_on_call.go`, `src/runtime/panic_on_call.go`
+- Panic-on-call instrumentation: `src/cmd/compile/internal/ssacompile/panic_on_call.go`, `src/runtime/panic_on_call.go`
 - `go test` glue + flags: `src/cmd/go/internal/test/testflag.go`, `src/cmd/go/internal/test/test.go`
 - Fuzz capture/encoding for LibAFL: `src/testing/fuzz.go`, `src/testing/libafl.go`
 - LibAFL runner (Rust): `golibafl/src/main.rs`

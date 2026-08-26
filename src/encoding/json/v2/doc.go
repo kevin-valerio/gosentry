@@ -9,6 +9,8 @@
 // primitive data types such as booleans, strings, and numbers,
 // in addition to structured data types such as objects and arrays.
 //
+// See the [Working with JSON] tutorial for an introduction to this package.
+//
 // [Marshal] and [Unmarshal] encode and decode Go values
 // to/from JSON text contained within a []byte.
 // [MarshalWrite] and [UnmarshalRead] operate on JSON text
@@ -84,10 +86,12 @@
 //     to instead be encoded as a JSON number quoted within a JSON string,
 //     and to be decoded from a JSON string containing the JSON number
 //     without any surrounding whitespace.
-//     The "string" option only applies to the top-level of the Go struct field value.
-//     Specifically, for the default representation of composite Go data types
-//     (e.g., array, slice, struct, or map), it will not stringify JSON numbers
-//     within such types. Applying this option to invalid types causes a runtime error.
+//     The "string" option only applies to the top-level of the Go struct field
+//     value. It is an error to apply this option to any type that does not
+//     encode as a JSON number.
+//     Note that composite types such as arrays, slices, structs, and maps do
+//     not encode as a JSON number, so applying this option will cause an error
+//     rather than affecting JSON numbers within such types.
 //     This extra level of encoding is often necessary since many JSON parsers
 //     cannot precisely represent 64-bit integers.
 //
@@ -142,7 +146,9 @@
 // with embedded struct types.
 //
 // Marshaling or unmarshaling a non-empty struct
-// without any JSON-representable fields results in a [SemanticError].
+// without any JSON-representable fields results in a [SemanticError],
+// unless the Go struct has a field with an explicit `json` tag,
+// which signals that the type has a valid JSON representation (even if empty).
 // Unexported fields must not have any `json` tags except for `json:"-"`.
 //
 // # Security Considerations
@@ -237,6 +243,7 @@
 // The v2 API generally chooses more secure defaults than v1,
 // but care should still be taken with large integers or unknown members.
 //
+// [Working with JSON]: https://go.dev/doc/tutorial/json
 // [For example, suppose we have two micro-services.]: https://www.youtube.com/watch?v=avilmOcHKHE&t=1057s
 package json
 

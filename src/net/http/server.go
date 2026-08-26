@@ -1225,6 +1225,8 @@ func (w *response) WriteHeader(code int) {
 	// We shouldn't send any further headers after 101 Switching Protocols,
 	// so it takes the non-informational path.
 	if code >= 100 && code <= 199 && code != StatusSwitchingProtocols {
+		w.writeContinueMu.Lock()
+		defer w.writeContinueMu.Unlock()
 		writeStatusLine(w.conn.bufw, w.req.ProtoAtLeast(1, 1), code, w.statusBuf[:])
 
 		// Per RFC 8297 we must not clear the current header map
@@ -2245,6 +2247,8 @@ func (c *conn) maybeServeUnencryptedHTTP2(ctx context.Context) bool {
 		const sawClientPreface = true
 		c.server.serveHTTP2Conn(ctx, c.rwc, serverHandler{c.server}, sawClientPreface, nil, nil)
 	} else {
+		c.rwc.SetReadDeadline(time.Time{})
+		c.rwc.SetWriteDeadline(time.Time{})
 		h := unencryptedHTTP2Request{ctx, c.rwc, serverHandler{c.server}}
 		nextFunc(c.server, unencryptedTLSConn(c.rwc), h)
 	}

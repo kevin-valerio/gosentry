@@ -301,6 +301,16 @@ var genericOps = []opData{
 	{name: "Max64F", argLength: 2}, // max(arg0,arg1)
 	{name: "Max32F", argLength: 2}, // max(arg0,arg1)
 
+	// Float min/max with the "arg0 < arg1 ? arg0 : arg1" comparison-select
+	// semantics (min) and "arg0 > arg1 ? arg0 : arg1" (max): ties and NaN
+	// yield arg1. These differ from the IEEE Min/Max ops above and match the
+	// MINSD/MAXSD and FCSEL hardware. branchelim emits them for the float
+	// min/max branch idiom on architectures that lower them unconditionally.
+	{name: "Min64FSel", argLength: 2}, // arg0 < arg1 ? arg0 : arg1
+	{name: "Min32FSel", argLength: 2}, // arg0 < arg1 ? arg0 : arg1
+	{name: "Max64FSel", argLength: 2}, // arg0 > arg1 ? arg0 : arg1
+	{name: "Max32FSel", argLength: 2}, // arg0 > arg1 ? arg0 : arg1
+
 	// 3-input opcode.
 	// Fused-multiply-add, float64 only.
 	// When a*b+c is exactly zero (before rounding), then the result is +0 or -0.
@@ -419,7 +429,7 @@ var genericOps = []opData{
 
 	// PanicBounds and PanicExtend generate a runtime panic.
 	// Their arguments provide index values to use in panic messages.
-	// Both PanicBounds and PanicExtend have an AuxInt value from the BoundsKind type (in ../op.go).
+	// Both PanicBounds and PanicExtend have an AuxInt value from the BoundsKind type (in ../ssacore/bounds.go).
 	// PanicBounds' index is int sized.
 	// PanicExtend's index is int64 sized. (PanicExtend is only used on 32-bit archs.)
 	{name: "PanicBounds", argLength: 3, aux: "Int64", typ: "Mem", call: true}, // arg0=idx, arg1=len, arg2=mem, returns memory.
@@ -727,6 +737,9 @@ var genericOps = []opData{
 	{name: "IsNaNFloat64x2", argLength: 1},
 	{name: "IsNaNFloat64x4", argLength: 1},
 	{name: "IsNaNFloat64x8", argLength: 1},
+
+	{name: "ScalableVectorLen", argLength: 0}, // SVE runtime vector length in bytes
+	{name: "Count8s", argLength: 1},           // arg0 = active byte count; builds an SVE predicate over that many byte lanes
 }
 
 //     kind          controls          successors   implicit exit

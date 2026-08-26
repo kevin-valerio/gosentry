@@ -933,6 +933,20 @@ func loadPackageData(ld *modload.Loader, ctx context.Context, path, parentPath, 
 					modroot = gorootSrcCmd
 				}
 			}
+			if modroot == "" && cfg.BuildMod == "vendor" && ld.Enabled() {
+				// (If an enclosing module was chosen instead, modindex.GetPackage
+				// would return ErrNotIndexed because indexing stops at go.mod
+				// boundaries, silently falling back to slow unindexed ImportDir.)
+				// Find the most specific (longest) module root containing r.dir.
+				// In a workspace, one module might be a subdirectory of another
+				// (for example, /path/to/repo and /path/to/repo/submodule).
+				for _, m := range ld.MainModules.Versions() {
+					root := ld.MainModules.ModRoot(m)
+					if root != "" && str.HasFilePathPrefix(r.dir, root) && len(root) > len(modroot) {
+						modroot = root
+					}
+				}
+			}
 			if modroot != "" {
 				if rp, err := modindex.GetPackage(modroot, r.dir); err == nil {
 					data.p, data.err = rp.Import(cfg.BuildContext, buildMode)
@@ -1056,7 +1070,7 @@ var preloadWorkerCount = runtime.GOMAXPROCS(0)
 // modified by modload.LoadPackages.
 type preload struct {
 	cancel chan struct{}
-	sema   chan struct{}
+	queue  *par.Queue
 }
 
 // newPreload creates a new preloader. flush must be called later to avoid
@@ -1064,7 +1078,7 @@ type preload struct {
 func newPreload() *preload {
 	pre := &preload{
 		cancel: make(chan struct{}),
-		sema:   make(chan struct{}, preloadWorkerCount),
+		queue:  par.NewQueue(preloadWorkerCount),
 	}
 	return pre
 }
@@ -1075,19 +1089,18 @@ func newPreload() *preload {
 func (pre *preload) preloadMatches(ld *modload.Loader, ctx context.Context, opts PackageOpts, matches []*search.Match) {
 	for _, m := range matches {
 		for _, pkg := range m.Pkgs {
-			select {
-			case <-pre.cancel:
-				return
-			case pre.sema <- struct{}{}:
-				go func(pkg string) {
-					mode := 0 // don't use vendoring or module import resolution
-					bp, loaded, err := loadPackageData(ld, ctx, pkg, "", base.Cwd(), "", false, mode)
-					<-pre.sema
-					if bp != nil && loaded && err == nil && !opts.IgnoreImports {
-						pre.preloadImports(ld, ctx, opts, bp.Imports, bp)
-					}
-				}(pkg)
-			}
+			pre.queue.Add(func() {
+				select {
+				case <-pre.cancel:
+					return
+				default:
+				}
+				mode := 0 // don't use vendoring or module import resolution
+				bp, loaded, err := loadPackageData(ld, ctx, pkg, "", base.Cwd(), "", false, mode)
+				if bp != nil && loaded && err == nil && !opts.IgnoreImports {
+					pre.preloadImports(ld, ctx, opts, bp.Imports, bp)
+				}
+			})
 		}
 	}
 }
@@ -1101,18 +1114,17 @@ func (pre *preload) preloadImports(ld *modload.Loader, ctx context.Context, opts
 		if path == "C" || path == "unsafe" {
 			continue
 		}
-		select {
-		case <-pre.cancel:
-			return
-		case pre.sema <- struct{}{}:
-			go func(path string) {
-				bp, loaded, err := loadPackageData(ld, ctx, path, parent.ImportPath, parent.Dir, parent.Root, parentIsStd, ResolveImport)
-				<-pre.sema
-				if bp != nil && loaded && err == nil && !opts.IgnoreImports {
-					pre.preloadImports(ld, ctx, opts, bp.Imports, bp)
-				}
-			}(path)
-		}
+		pre.queue.Add(func() {
+			select {
+			case <-pre.cancel:
+				return
+			default:
+			}
+			bp, loaded, err := loadPackageData(ld, ctx, path, parent.ImportPath, parent.Dir, parent.Root, parentIsStd, ResolveImport)
+			if bp != nil && loaded && err == nil && !opts.IgnoreImports {
+				pre.preloadImports(ld, ctx, opts, bp.Imports, bp)
+			}
+		})
 	}
 }
 
@@ -1127,9 +1139,7 @@ func (pre *preload) flush() {
 	}
 
 	close(pre.cancel)
-	for i := 0; i < preloadWorkerCount; i++ {
-		pre.sema <- struct{}{}
-	}
+	<-pre.queue.Idle()
 }
 
 func cleanImport(path string) string {
@@ -1694,16 +1704,12 @@ func FindVendor(path string) (index int, ok bool) {
 type TargetDir int
 
 const (
-	ToTool    TargetDir = iota // to GOROOT/pkg/tool (default for cmd/*)
-	ToBin                      // to bin dir inside package root (default for non-cmd/*)
-	StalePath                  // an old import path; fail to build
+	ToTool TargetDir = iota // to GOROOT/pkg/tool (default for cmd/*)
+	ToBin                   // to bin dir inside package root (default for non-cmd/*)
 )
 
 // InstallTargetDir reports the target directory for installing the command p.
 func InstallTargetDir(p *Package) TargetDir {
-	if strings.HasPrefix(p.ImportPath, "code.google.com/p/go.tools/cmd/") {
-		return StalePath
-	}
 	if p.Goroot && strings.HasPrefix(p.ImportPath, "cmd/") && p.Name == "main" {
 		switch p.ImportPath {
 		case "cmd/go", "cmd/gofmt":
@@ -1842,15 +1848,6 @@ func (p *Package) load(ld *modload.Loader, ctx context.Context, opts PackageOpts
 	}
 
 	if useBindir {
-		// Report an error when the old code.google.com/p/go.tools paths are used.
-		if InstallTargetDir(p) == StalePath {
-			// TODO(matloob): remove this branch, and StalePath itself. code.google.com/p/go is so
-			// old, even this code checking for it is stale now!
-			newPath := strings.Replace(p.ImportPath, "code.google.com/p/go.", "golang.org/x/", 1)
-			e := ImportErrorf(p.ImportPath, "the %v command has moved; use %v instead.", p.ImportPath, newPath)
-			setError(e)
-			return
-		}
 		elem := p.DefaultExecName() + cfg.ExeSuffix
 		full := filepath.Join(cfg.BuildContext.GOOS+"_"+cfg.BuildContext.GOARCH, elem)
 		if cfg.BuildContext.GOOS != runtime.GOOS || cfg.BuildContext.GOARCH != runtime.GOARCH {
@@ -2663,7 +2660,7 @@ omitVCS:
 // GNU binutils flagfile specifiers, sometimes called "response files").
 // To be conservative, we reject almost any arg beginning with non-alphanumeric ASCII.
 // We accept leading . _ and / as likely in file system paths.
-// There is a copy of this function in cmd/compile/internal/gc/noder.go.
+// There is a copy of this function in cmd/compile/internal/noder/noder.go.
 func SafeArg(name string) bool {
 	if name == "" {
 		return false
@@ -3267,6 +3264,8 @@ func setToolFlags(ld *modload.Loader, pkgs ...*Package) {
 	}
 }
 
+var errFileNotFound = errors.New("file not found")
+
 // GoFilesPackage creates a package for building a collection of Go files
 // (typically named on the command line). The target is named p.a for
 // package p or named after the first Go file for package main.
@@ -3300,6 +3299,11 @@ func GoFilesPackage(ld *modload.Loader, ctx context.Context, opts PackageOpts, g
 	for _, file := range gofiles {
 		fi, err := fsys.Stat(file)
 		if err != nil {
+			if os.IsNotExist(err) {
+				// Canonicalize OS-specific errors to errFileNotFound so that error
+				// messages will be easier for users to search for.
+				err = &fs.PathError{Op: "stat", Path: file, Err: errFileNotFound}
+			}
 			base.Fatalf("%s", err)
 		}
 		if fi.IsDir() {

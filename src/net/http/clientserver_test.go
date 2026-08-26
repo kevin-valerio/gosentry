@@ -60,6 +60,11 @@ const (
 	http3Mode            = testMode("h3")            // HTTP/3
 )
 
+type (
+	testAddMode  []testMode // default, plus these
+	testSkipMode []testMode // default, minus these
+)
+
 // http3SkippedMode is a convenient alias for []testMode{http1Mode, http2Mode},
 // which was the default test mode used by run and runSynctest prior to HTTP/3
 // development.
@@ -79,10 +84,14 @@ func (m testMode) Scheme() string {
 	panic("unknown testMode")
 }
 
-type testNotParallelOpt struct{}
+type (
+	testNotParallelOpt struct{}
+	testRealNetOpt     struct{}
+)
 
 var (
 	testNotParallel = testNotParallelOpt{}
+	optRealNet      = testRealNetOpt{}
 )
 
 type TBRun[T any] interface {
@@ -103,6 +112,16 @@ func run[T TBRun[T]](t T, f func(t T, mode testMode), opts ...any) {
 	parallel := true
 	for _, opt := range opts {
 		switch opt := opt.(type) {
+		case testAddMode:
+			for _, m := range opt {
+				if !slices.Contains(modes, m) {
+					modes = append(modes, m)
+				}
+			}
+		case testSkipMode:
+			modes = slices.DeleteFunc(modes, func(m testMode) bool {
+				return slices.Contains(opt, m)
+			})
 		case []testMode:
 			modes = opt
 		case testNotParallelOpt:
@@ -115,17 +134,22 @@ func run[T TBRun[T]](t T, f func(t T, mode testMode), opts ...any) {
 		setParallel(t)
 	}
 	for _, mode := range modes {
-		// TODO(nsh): re-enable the tests once tree re-opens.
-		if mode == http3Mode {
-			continue
-		}
 		t.Run(string(mode), func(t T) {
+			panicking := false
+			defer func() {
+				if err := recover(); err != nil {
+					panicking = true
+					panic(err)
+				}
+			}()
 			t.Helper()
 			if t, ok := any(t).(*testing.T); ok && parallel {
 				setParallel(t)
 			}
 			t.Cleanup(func() {
-				afterTest(t)
+				if !panicking {
+					afterTest(t)
+				}
 			})
 			f(t, mode)
 		})
@@ -144,13 +168,13 @@ func runSynctest(t *testing.T, f func(t *testing.T, mode testMode), opts ...any)
 }
 
 type clientServerTest struct {
-	t  testing.TB
-	h2 bool
-	h  Handler
-	ts *httptest.Server
-	tr *Transport
-	c  *Client
-	li *fakeNetListener
+	t    testing.TB
+	h2   bool
+	h    Handler
+	ts   *httptest.Server
+	tr   *Transport
+	c    *Client
+	mode testMode
 }
 
 func (t *clientServerTest) close() {
@@ -188,8 +212,6 @@ func optWithServerLog(lg *log.Logger) func(*httptest.Server) {
 	}
 }
 
-var optFakeNet = new(struct{})
-
 // newClientServerTest creates and starts an httptest.Server.
 //
 // The mode parameter selects the implementation to test:
@@ -202,16 +224,18 @@ var optFakeNet = new(struct{})
 //	func(*httptest.Server) // run before starting the server
 //	func(*http.Transport)
 //
-// The optFakeNet option configures the server and client to use a fake network implementation,
-// suitable for use in testing/synctest tests.
+// The optRealNet option configures the server and client to use a loopback network connection.
+// This is mostly used for tests which predate fake networking support,
+// which haven't been updated yet.
 func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *clientServerTest {
 	if mode == http2Mode || mode == http2UnencryptedMode {
 		CondSkipHTTP2(t)
 	}
 	cst := &clientServerTest{
-		t:  t,
-		h2: mode == http2Mode,
-		h:  h,
+		t:    t,
+		h2:   mode == http2Mode,
+		h:    h,
+		mode: mode,
 	}
 
 	var transportFuncs []func(*Transport)
@@ -221,23 +245,13 @@ func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *c
 	}
 	var http3TransportOpts HTTP3TransportOpts
 
-	fakeNet := false
-	if idx := slices.Index(opts, any(optFakeNet)); idx >= 0 {
-		opts = slices.Delete(opts, idx, idx+1)
-		fakeNet = true
+	fakeNet := true
+	if idx := slices.Index(opts, any(optRealNet)); idx >= 0 {
+		fakeNet = false
 	}
 	switch {
 	case fakeNet && mode != http3Mode:
-		cst.li = fakeNetListen()
-		cst.ts = &httptest.Server{
-			Config:   &Server{Handler: h},
-			Listener: cst.li,
-		}
-		transportFuncs = append(transportFuncs, func(tr *Transport) {
-			tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
-				return cst.li.connect(), nil
-			}
-		})
+		cst.ts = httptest.NewTestServer(t, h)
 	case mode == http3Mode:
 		cst.ts = &httptest.Server{
 			Config: &Server{Handler: h},
@@ -245,10 +259,14 @@ func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *c
 		if fakeNet {
 			pnet := nettest.NewPacketNet()
 			srvAddr := net.UDPAddrFromAddrPort(netip.MustParseAddrPort("127.0.0.1:443"))
-			cliAddr := net.UDPAddrFromAddrPort(netip.MustParseAddrPort("127.0.0.1:100"))
+			var cliPort atomic.Uint32
+			cliPort.Store(100)
 			pconn, _ := pnet.NewConn(srvAddr)
 			cst.ts.Listener = http3ServeConn{conn: pconn}
 			http3TransportOpts.ListenPacket = func(network, addr string) (net.PacketConn, error) {
+				port := uint16(cliPort.Add(1))
+				cliAddr := net.UDPAddrFromAddrPort(netip.AddrPortFrom(
+					netip.MustParseAddr("127.0.0.1"), port))
 				return pnet.NewConn(cliAddr)
 			}
 		} else {
@@ -267,6 +285,7 @@ func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *c
 			opt(cst.ts)
 		case func(*Server):
 			opt(cst.ts.Config)
+		case testRealNetOpt:
 		default:
 			t.Fatalf("unhandled option type %T", opt)
 		}
@@ -283,18 +302,14 @@ func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *c
 	switch mode {
 	case http1Mode:
 		p.SetHTTP1(true)
-		cst.ts.Start()
 	case https1Mode:
 		p.SetHTTP1(true)
-		cst.ts.StartTLS()
 	case http2UnencryptedMode:
 		p.SetUnencryptedHTTP2(true)
-		cst.ts.Start()
 	case http2Mode:
 		p.SetHTTP2(true)
 		cst.ts.EnableHTTP2 = true
 		cst.ts.TLS = cst.ts.Config.TLSConfig
-		cst.ts.StartTLS()
 	case http3Mode:
 		http.ProtocolSetHTTP3(p)
 		cst.ts.TLS = cst.ts.Config.TLSConfig
@@ -311,7 +326,26 @@ func newClientServerTest(t testing.TB, mode testMode, h Handler, opts ...any) *c
 	default:
 		t.Fatalf("unknown test mode %v", mode)
 	}
-	cst.c = cst.ts.Client()
+
+	if !fakeNet {
+		switch mode {
+		case http1Mode, http2UnencryptedMode:
+			cst.ts.Start()
+		case https1Mode, http2Mode:
+			cst.ts.StartTLS()
+		}
+	}
+
+	cst.c = cst.ts.Client() // sets cst.ts.URL if it wasn't already
+
+	// Fakenet httptest servers always set the URL scheme to "http".
+	// Override it in https tests.
+	// Exclude HTTP3, which manages its own PacketNet URL, and lacks the
+	// ability to intercept "example.com".
+	if fakeNet && mode != http3Mode {
+		cst.ts.URL = mode.Scheme() + "://example.com"
+	}
+
 	cst.tr = cst.c.Transport.(*Transport)
 	for _, f := range transportFuncs {
 		f(cst.tr)
@@ -350,6 +384,47 @@ func (c http3ServeConn) HTTP3PacketConn() net.PacketConn {
 	return c.conn
 }
 
+func (cst *clientServerTest) dialNettest() (net.Conn, *nettest.Conn) {
+	cst.t.Helper()
+	dial := cst.tr.DialContext
+	if cst.mode.Scheme() == "https" {
+		dial = cst.tr.DialTLSContext
+	}
+	if dial == nil {
+		cst.t.Fatalf("tr.Dial(TLS) is not set")
+	}
+	conn, err := dial(cst.t.Context(), "tcp", "example.tld:"+cst.mode.Scheme())
+	if err != nil {
+		cst.t.Fatal(err)
+	}
+	cst.t.Cleanup(func() {
+		conn.Close()
+	})
+	if tlsConn, ok := conn.(*tls.Conn); ok {
+		return tlsConn, tlsConn.NetConn().(*nettest.Conn)
+	}
+	return conn, conn.(*nettest.Conn)
+}
+
+func (cst *clientServerTest) setDialNettestHook(f func(*nettest.Conn)) {
+	dialContext := cst.tr.DialContext
+	cst.tr.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+		conn, err := dialContext(ctx, network, address)
+		if err == nil {
+			f(conn.(*nettest.Conn))
+		}
+		return conn, err
+	}
+	dialTLSContext := cst.tr.DialTLSContext
+	cst.tr.DialTLSContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+		conn, err := dialTLSContext(ctx, network, address)
+		if err == nil {
+			f(conn.(*tls.Conn).NetConn().(*nettest.Conn))
+		}
+		return conn, err
+	}
+}
+
 type testLogWriter struct {
 	t testing.TB
 }
@@ -369,7 +444,7 @@ func TestNewClientServerTest(t *testing.T) {
 	})
 	t.Run("synctest", func(t *testing.T) {
 		runSynctest(t, func(t *testing.T, mode testMode) {
-			testNewClientServerTest(t, mode, optFakeNet)
+			testNewClientServerTest(t, mode)
 		}, modes)
 	})
 }
@@ -386,7 +461,7 @@ func testNewClientServerTest(t *testing.T, mode testMode, opts ...any) {
 		got.hasTLS = r.TLS != nil
 	})
 	cst := newClientServerTest(t, mode, h, opts...)
-	if _, err := cst.c.Head(cst.ts.URL); err != nil {
+	if _, err := cst.c.Head(mode.Scheme() + "://example.tld/"); err != nil {
 		t.Fatal(err)
 	}
 	var wantProto string
@@ -463,9 +538,12 @@ func (tt h12Compare) reqFunc() reqFunc {
 
 func (tt h12Compare) run(t *testing.T) {
 	setParallel(t)
-	cst1 := newClientServerTest(t, http1Mode, HandlerFunc(tt.Handler), tt.Opts...)
+	// Using a real network because httptest's fake networking mode doesn't (yet)
+	// support multiple servers on the same fake net.
+	opts := append(tt.Opts, optRealNet)
+	cst1 := newClientServerTest(t, http1Mode, HandlerFunc(tt.Handler), opts...)
 	defer cst1.close()
-	cst2 := newClientServerTest(t, http2Mode, HandlerFunc(tt.Handler), tt.Opts...)
+	cst2 := newClientServerTest(t, http2Mode, HandlerFunc(tt.Handler), opts...)
 	defer cst2.close()
 
 	res1, err := tt.reqFunc()(cst1.c, cst1.ts.URL)
@@ -1231,7 +1309,7 @@ func TestTransportDiscardsUnneededConns(t *testing.T) {
 func testTransportDiscardsUnneededConns(t *testing.T, mode testMode) {
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
 		fmt.Fprintf(w, "Hello, %v", r.RemoteAddr)
-	}))
+	}), optRealNet)
 	defer cst.close()
 
 	var numOpen, numClose int32 // atomic
@@ -1406,9 +1484,23 @@ func testTransportRejectsInvalidHeaders(t *testing.T, mode testMode) {
 
 func TestInterruptWithPanic(t *testing.T) {
 	run(t, func(t *testing.T, mode testMode) {
-		t.Run("boom", func(t *testing.T) { testInterruptWithPanic(t, mode, "boom") })
-		t.Run("nil", func(t *testing.T) { t.Setenv("GODEBUG", "panicnil=1"); testInterruptWithPanic(t, mode, nil) })
-		t.Run("ErrAbortHandler", func(t *testing.T) { testInterruptWithPanic(t, mode, ErrAbortHandler) })
+		for _, test := range []struct {
+			name       string
+			panicValue any
+		}{
+			{"boom", "boom"},
+			{"nil", nil},
+			{"ErrAbortHandler", ErrAbortHandler},
+		} {
+			t.Run(test.name, func(t *testing.T) {
+				synctest.Test(t, func(t *testing.T) {
+					if test.panicValue == nil {
+						t.Setenv("GODEBUG", "panicnil=1")
+					}
+					testInterruptWithPanic(t, mode, test.panicValue)
+				})
+			})
+		}
 	}, testNotParallel, http3SkippedMode)
 }
 func testInterruptWithPanic(t *testing.T, mode testMode, panicValue any) {
@@ -1419,7 +1511,8 @@ func testInterruptWithPanic(t *testing.T, mode testMode, panicValue any) {
 
 	var errorLog lockedBytesBuffer
 	gotHeaders := make(chan bool, 1)
-	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, mode, nil)
+	cst.ts.Config.Handler = HandlerFunc(func(w ResponseWriter, r *Request) {
 		io.WriteString(w, msg)
 		w.(Flusher).Flush()
 
@@ -1428,9 +1521,8 @@ func testInterruptWithPanic(t *testing.T, mode testMode, panicValue any) {
 		case <-testDone:
 		}
 		panic(panicValue)
-	}), func(ts *httptest.Server) {
-		ts.Config.ErrorLog = log.New(&errorLog, "", 0)
 	})
+	cst.ts.Config.ErrorLog = log.New(&errorLog, "", 0)
 	res, err := cst.c.Get(cst.ts.URL)
 	if err != nil {
 		t.Fatal(err)
@@ -1451,28 +1543,20 @@ func testInterruptWithPanic(t *testing.T, mode testMode, panicValue any) {
 	}
 	wantStackLogged := panicValue != nil && panicValue != ErrAbortHandler
 
-	waitCondition(t, 10*time.Millisecond, func(d time.Duration) bool {
-		gotLog := logOutput()
-		if !wantStackLogged {
-			if gotLog == "" {
-				return true
-			}
+	synctest.Wait()
+	gotLog := logOutput()
+	if !wantStackLogged {
+		if gotLog != "" {
 			t.Fatalf("want no log output; got: %s", gotLog)
 		}
+	} else {
 		if gotLog == "" {
-			if d > 0 {
-				t.Logf("wanted a stack trace logged; got nothing after %v", d)
-			}
-			return false
+			t.Fatalf("wanted a stack trace logged; got nothing")
 		}
 		if !strings.Contains(gotLog, "created by ") && strings.Count(gotLog, "\n") < 6 {
-			if d > 0 {
-				t.Logf("output doesn't look like a panic stack trace after %v. Got: %s", d, gotLog)
-			}
-			return false
+			t.Fatalf("output doesn't look like a panic stack trace. Got: %s", gotLog)
 		}
-		return true
-	})
+	}
 }
 
 type lockedBytesBuffer struct {
@@ -1949,7 +2033,7 @@ func TestClientServerTLSConnWrapper(t *testing.T) {
 		protocols.SetHTTP1(true)
 		protocols.SetHTTP2(true)
 
-		li := fakeNetListen()
+		li := nettest.NewListener()
 		server := &Server{
 			Handler: HandlerFunc(func(w ResponseWriter, r *Request) {
 				if r.TLS == nil {
@@ -1981,7 +2065,7 @@ func TestClientServerTLSConnWrapper(t *testing.T) {
 		tr := &Transport{
 			DialTLS: func(network, address string) (net.Conn, error) {
 				return &testTLSConn{
-					Conn: li.connect(),
+					Conn: li.NewConn(),
 					state: tls.ConnectionState{
 						Version:            tls.VersionTLS13,
 						CipherSuite:        tls.TLS_AES_128_GCM_SHA256,

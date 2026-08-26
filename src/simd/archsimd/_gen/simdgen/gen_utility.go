@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"simd/archsimd/_gen/simdgen/types"
 	"slices"
 	"sort"
 	"strings"
@@ -164,6 +165,14 @@ func (op *Operation) shape() (shapeIn inShape, shapeOut outShape, maskType maskS
 	hasVreg := false
 	hasListIn := false
 	for _, in := range op.In {
+		if in.IsImplicitAllTrue() {
+			// An SVE implicit-all-true governing predicate is not part of the Go
+			// API: it must not count as a mask input here, so the op classifies as
+			// an unpredicated (PureVregIn/NoMask) op. The machine op and lowering
+			// rule reconstruct it separately (regShape counts it by class; the rule
+			// synthesizes an all-true predicate).
+			continue
+		}
 		if in.ListNumber != nil {
 			hasListIn = true
 		}
@@ -177,7 +186,7 @@ func (op *Operation) shape() (shapeIn inShape, shapeOut outShape, maskType maskS
 		if in.Class == "immediate" {
 			// A manual check on XED data found that AMD64 SIMD instructions at most
 			// have 1 immediates. So we don't need to check this here.
-			if *in.Bits != 8 {
+			if in.Bits.N() != 8 {
 				panic(fmt.Errorf("simdgen only supports immediates of 8 bits: %s", op))
 			}
 			hasImm = true
@@ -347,6 +356,12 @@ func (op *Operation) regShape(mem memShape) (string, error) {
 		panic("simdgen does not understand memory as output as of now")
 	}
 	regInfo += fixedName
+	if CurrentArch().isSVE() && strings.HasPrefix(regInfo, "v") {
+		// SVE vectors live in the scalable Z bank, not the NEON V bank, so name
+		// their shapes with a "z" (z21, z11, ...). This keeps the generated
+		// lowering helpers (simdZ21) and regInfo keys distinct from NEON's.
+		regInfo = "z" + regInfo[1:]
+	}
 	return regInfo, nil
 }
 
@@ -371,7 +386,7 @@ func (op *Operation) adjustAsm() {
 	if op.Asm == "VCVTTPD2DQ" || op.Asm == "VCVTTPD2UDQ" ||
 		op.Asm == "VCVTQQ2PS" || op.Asm == "VCVTUQQ2PS" ||
 		op.Asm == "VCVTPD2PS" {
-		switch *op.In[0].Bits {
+		switch op.In[0].Bits.N() {
 		case 128:
 			op.Asm += "X"
 		case 256:
@@ -410,7 +425,16 @@ func (op Operation) SSAType() string {
 	if op.Out[0].Class == "greg" {
 		return fmt.Sprintf("types.Types[types.T%s]", strings.ToUpper(op.goNormalType()))
 	}
-	return fmt.Sprintf("types.TypeVec%d", *op.Out[0].Bits)
+	if op.Out[0].Class == "mask" && CurrentArch().isSVE() {
+		// SVE predicates are represented as-is (a real mask/P-register value),
+		// not as a data vector. On AVX a mask is a vector at the generic-op level
+		// (types.TypeVec*), so this only applies to the scalable target.
+		return "types.TypeMask"
+	}
+	if op.Out[0].Bits.Scalable {
+		return fmt.Sprintf("types.TypeVec%d", types.MaxVectorBits)
+	}
+	return fmt.Sprintf("types.TypeVec%d", op.Out[0].Bits.N())
 }
 
 // GoType returns the Go type returned by this operation (relative to the simd package),
@@ -434,20 +458,6 @@ func (op Operation) ImmType() string {
 		return "uint64"
 	}
 	return "uint8"
-}
-
-func (o Operand) OpName(s string) string {
-	if n := o.Name; n != nil {
-		return *n
-	}
-	if o.Class == "mask" {
-		return "mask"
-	}
-	return s
-}
-
-func (o Operand) OpNameAndType(s string) string {
-	return o.OpName(s) + " " + *o.Go
 }
 
 // GoExported returns [Go] with first character capitalized.
@@ -558,7 +568,9 @@ func classifyOp(op Operation) (string, Operation, error) {
 		}
 		return class, op, nil
 	} else {
-		switch l := len(gOp.In); l {
+		// Implicit-all-true predicates are machine-op inputs only; they are absent
+		// from the Go API, so they must not affect which opLenN/stub class is picked.
+		switch l := len(gOp.In) - gOp.implicitPredCount(); l {
 		case 1, 2, 3, 4:
 			class = classes[l]
 		default:
@@ -621,7 +633,7 @@ func rewriteVecAsScalarRegInfo(op Operation, regInfo string) (string, error) {
 }
 
 func rewriteLastVregToMem(op Operation) Operation {
-	newIn := make([]Operand, len(op.In))
+	newIn := make([]types.Operand, len(op.In))
 	lastVregIdx := -1
 	for i := range len(op.In) {
 		newIn[i] = op.In[i]
@@ -780,26 +792,30 @@ func capitalizeFirst(s string) string {
 //     and [writeSIMDSSA], please be careful when updating these constraints.
 func overwrite(ops []Operation) error {
 	hasClassOverwrite := false
-	overwrite := func(op []Operand, idx int, o Operation) error {
+	overwrite := func(op []types.Operand, idx int, o Operation) error {
 		if op[idx].OverwriteElementBits != nil {
 			if op[idx].ElemBits == nil {
 				panic(fmt.Errorf("ElemBits is nil at operand %d of %v", idx, o))
 			}
 			*op[idx].ElemBits = *op[idx].OverwriteElementBits
-			*op[idx].Lanes = *op[idx].Bits / *op[idx].ElemBits
-			*op[idx].Go = fmt.Sprintf("%s%dx%d", capitalizeFirst(*op[idx].Base), *op[idx].ElemBits, *op[idx].Lanes)
+			if !op[idx].Bits.Scalable {
+				*op[idx].Lanes = op[idx].Bits.N() / *op[idx].ElemBits
+				*op[idx].Go = fmt.Sprintf("%s%dx%d", capitalizeFirst(*op[idx].Base), *op[idx].ElemBits, *op[idx].Lanes)
+			} else {
+				*op[idx].Go = fmt.Sprintf("%s%ds", capitalizeFirst(*op[idx].Base), *op[idx].ElemBits)
+			}
 		}
 		if CurrentArch().Arch == "arm64" && op[idx].OverwriteClass != nil && *op[idx].OverwriteClass == "greg" {
 			if op[idx].OverwriteBase == nil {
-				panic(fmt.Errorf("simdgen: [OverwriteClass] must be set together with [OverwriteBase]: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [OverwriteClass] must be set together with [OverwriteBase]: %v", op[idx]))
 			}
 			oBase := *op[idx].OverwriteBase
 			oClass := *op[idx].OverwriteClass
 			if oBase != "float" {
-				panic(fmt.Errorf("simdgen: [Class] overwrite must set [OverwriteBase] to float: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [Class] overwrite must set [OverwriteBase] to float: %v", op[idx]))
 			}
 			if op[idx].Class != "vreg" {
-				panic(fmt.Errorf("simdgen: [Class] overwrite must be overwriting [Class] from vreg: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [Class] overwrite must be overwriting [Class] from vreg: %v", op[idx]))
 			}
 			// The low lane of vreg (with other lanes zeroed) also represents a regular floating point greg.
 			// This is supposed to be used only by special instructions like float GetElem
@@ -810,18 +826,18 @@ func overwrite(ops []Operation) error {
 			*op[idx].Go = fmt.Sprintf("float%d", *op[idx].ElemBits)
 		} else if op[idx].OverwriteClass != nil {
 			if op[idx].OverwriteBase == nil {
-				panic(fmt.Errorf("simdgen: [OverwriteClass] must be set together with [OverwriteBase]: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [OverwriteClass] must be set together with [OverwriteBase]: %v", op[idx]))
 			}
 			oBase := *op[idx].OverwriteBase
 			oClass := *op[idx].OverwriteClass
 			if oClass != "mask" {
-				panic(fmt.Errorf("simdgen: [Class] overwrite only supports overwriting to mask: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [Class] overwrite only supports overwriting to mask: %v", op[idx]))
 			}
 			if oBase != "int" {
-				panic(fmt.Errorf("simdgen: [Class] overwrite must set [OverwriteBase] to int: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [Class] overwrite must set [OverwriteBase] to int: %v", op[idx]))
 			}
 			if op[idx].Class != "vreg" {
-				panic(fmt.Errorf("simdgen: [Class] overwrite must be overwriting [Class] from vreg: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [Class] overwrite must be overwriting [Class] from vreg: %v", op[idx]))
 			}
 			hasClassOverwrite = true
 			*op[idx].Base = oBase
@@ -836,10 +852,10 @@ func overwrite(ops []Operation) error {
 			*op[idx].Base = oBase
 		} else if op[idx].OverwriteBits != nil {
 			if op[idx].Class != "greg" {
-				panic(fmt.Errorf("simdgen: [OverwriteBits] is only supported for greg int: %s", op[idx]))
+				panic(fmt.Errorf("simdgen: [OverwriteBits] is only supported for greg int: %v", op[idx]))
 			}
-			*op[idx].Bits = *op[idx].OverwriteBits
-			*op[idx].Go = fmt.Sprintf("%s%d", *op[idx].Base, *op[idx].Bits)
+			op[idx].Bits = types.VectorSize{Scalable: false, NRaw: *op[idx].OverwriteBits}
+			*op[idx].Go = fmt.Sprintf("%s%d", *op[idx].Base, op[idx].Bits.N())
 		}
 		return nil
 	}
@@ -879,7 +895,7 @@ func reportXEDInconsistency(ops []Operation) error {
 	for _, o := range ops {
 		if o.NameAndSizeCheck != nil {
 			suffixSizeMap := map[byte]int{'B': 8, 'W': 16, 'D': 32, 'Q': 64}
-			checkOperand := func(opr Operand) error {
+			checkOperand := func(opr types.Operand) error {
 				if opr.ElemBits == nil {
 					return fmt.Errorf("simdgen expects elemBits to be set when performing NameAndSizeCheck")
 				}
@@ -940,10 +956,6 @@ func getVbcstData(s string) (string, string) {
 
 func (o Operation) String() string {
 	return pprints(o)
-}
-
-func (op Operand) String() string {
-	return pprints(op)
 }
 
 // hiHalfOpName constructs the SSA machine op name for a hi-half "2" variant.
