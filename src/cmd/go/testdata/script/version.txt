@@ -30,16 +30,11 @@ go version
 stdout '^go version'
 env GOFLAGS=
 
-env GO111MODULE=on
-
 # Check that very basic version lookup succeeds.
 go build empty.go
 go version empty$GOEXE
 [cgo] go build -ldflags=-linkmode=external empty.go
 [cgo] go version empty$GOEXE
-
-# Skip the remaining builds if we are running in short mode.
-[short] skip
 
 # Check that 'go version' and 'go version -m' work on a binary built in module mode.
 go get rsc.io/fortune

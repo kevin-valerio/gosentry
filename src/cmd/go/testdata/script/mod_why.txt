@@ -1,5 +1,3 @@
-env GO111MODULE=on
-
 # 'go mod why -m' should reject malformed module paths before loading
 # the module graph.
 ! go mod why -m golang.org/x/text/
@@ -10,8 +8,6 @@ stderr '^go mod why: malformed module path "golang.org/x/text/": trailing slash$
 stderr '^go mod why: malformed module path "golang.org//x/...": double slash$'
 ! go mod why -m golang.org/...//.../text
 stderr '^go mod why: malformed module path "golang.org/...//.../text": double slash$'
-
-[short] skip
 
 # Populate go.sum.
 go mod tidy
