@@ -44,15 +44,16 @@ var hwClmul = true
 
 func init() {
 	actualMax, allFeatureSize := archMaxVectorSize() // zero == no simd, zero == features unavailable
-	gosimd := simd.Value()
+	maxVectorSize, emulated, hwClmul = configure(actualMax, allFeatureSize, simd.Value())
+}
+
+func configure(actualMax, allFeatureSize int, gosimd string) (maxVectorSize int, emulated, hwClmul bool) {
 	explicitRequest := false
+	hwClmul = true
 
 	// No SIMD, must emulate
 	if actualMax == 0 {
-		maxVectorSize = 128
-		emulated = true
-		hwClmul = false
-		return
+		return 128, true, false
 	}
 
 	maxVectorSize = actualMax
@@ -61,12 +62,15 @@ func init() {
 	// any hardware feature check disabling of hardware SIMD.
 	// The '+' may be followed by a size, expected to be 0, 128, 256, 512.
 	// If it is zero (e.g., "0" or +0") then hardware SIMD is still disabled.
+	if gosimd == "1" {
+		gosimd = "+"
+	}
 	if len(gosimd) > 0 && gosimd[0] == '+' {
 		// override feature reduction
 		// keep maxVectorSize
 		// emulated remains false
 		// note if features missing.
-		hwClmul = allFeatureSize < actualMax
+		hwClmul = allFeatureSize >= actualMax
 		gosimd = gosimd[1:]
 		explicitRequest = true
 
@@ -83,35 +87,38 @@ func init() {
 	}
 
 	if gosimd == "" {
-		return
+		return maxVectorSize, emulated, hwClmul
 	}
 
 	// possible adjustment to chosen size
 	val, err := strconv.Atoi(gosimd)
 	if err != nil {
-		panic(fmt.Errorf("Could not parse GODEBUG=gosimd='%s' as a decimal number, %v", gosimd, err))
-	}
-	if val > actualMax {
-		panic(fmt.Errorf("Requested GODEBUG=gosimd=%d is larger than the simd length (%d) supported on this cpu ", val, actualMax))
-	}
-	if !explicitRequest && val > allFeatureSize {
-		panic(fmt.Errorf("Requested GODEBUG=gosimd=%d is larger than the simd length required for expected features (%d) on this cpu. GODEBUG=gosimd='+%d' will skip this check.", val, allFeatureSize, val))
+		panic(fmt.Errorf("could not parse GODEBUG=simd='%s' as a decimal number: %v", gosimd, err))
 	}
 	if val < 0 {
-		panic(fmt.Errorf("Requested GODEBUG=gosimd=%d is negative", val))
+		panic(fmt.Errorf("requested GODEBUG=simd=%d is negative", val))
+	}
+	if val != 0 && val != 128 && val != 256 && val != 512 {
+		panic(fmt.Errorf("requested GODEBUG=simd=%d is not a supported vector size (want 0, 128, 256, or 512)", val))
+	}
+	if val > actualMax {
+		panic(fmt.Errorf("requested GODEBUG=simd=%d is larger than the SIMD length (%d) supported on this CPU", val, actualMax))
+	}
+	if !explicitRequest && val > allFeatureSize {
+		panic(fmt.Errorf("requested GODEBUG=simd=%d is larger than the SIMD length required for expected features (%d) on this CPU; GODEBUG=simd=+%d will skip this check", val, allFeatureSize, val))
 	}
 	// user-requested emulation
 	if val == 0 {
 		maxVectorSize = 128
 		hwClmul = false
 		emulated = true
-		return
+		return maxVectorSize, emulated, hwClmul
 	}
 
 	hwClmul = allFeatureSize >= val
 	maxVectorSize = val
 	emulated = false
-	return
+	return maxVectorSize, emulated, hwClmul
 }
 
 // VectorBitSize returns the bit length of the longest vector available
@@ -128,7 +135,7 @@ func Emulated() bool {
 }
 
 // HasHardwareCarrylessMultiply returns whether this platform
-// as a hardware-implemented version of carryless multiply.
+// has a hardware-implemented version of carryless multiply.
 // With default GODEBUG=simd settings, if this is false,
 // it is emulated and merely slow, but with non-default settings
 // this can indicate the possibility of a missing instruction
