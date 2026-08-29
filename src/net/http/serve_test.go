@@ -8145,9 +8145,6 @@ func TestServerConnectionReuse(t *testing.T) {
 }
 
 func TestServerRequestBodyLength(t *testing.T) {
-	joinCRLF := func(s ...string) string {
-		return strings.Join(s, "\r\n")
-	}
 	for _, test := range []struct {
 		name              string
 		message           string
@@ -8482,6 +8479,50 @@ func TestServerRequestBodyCloseAfterPartialRead(t *testing.T) {
 		}
 		if err := <-closeErr; err != nil {
 			t.Errorf("Request.Body.Close() = %v, want nil", err)
+		}
+	})
+}
+
+// A read error that is not io.EOF means the connection is gone in both
+// directions. A handler blocked writing a response must not stay blocked:
+// on some systems the poller stops reporting the socket as writable once a
+// read has consumed the socket's pending error, so the write would never
+// complete. See go.dev/issue/78438.
+func TestServerAbortsWriteOnConnReadError(t *testing.T) {
+	synctest.Test(t, func(t *testing.T) {
+		handler := newTestHandler(t)
+		st := newHTTP1ServerTest(t, handler.ServeHTTP)
+		defer handler.Close() // return from handlers before server shutdown
+		conn := st.dial()
+		conn.writeMessage(
+			"GET / HTTP/1.1",
+			"Host: example.tld",
+			"",
+		)
+		call := handler.nextCall()
+
+		// Nothing reads the response, so the handler blocks writing it.
+		conn.conn.SetReadBufferSize(0)
+		var writeErr error
+		writing := true
+		go func() {
+			call.do(func(w ResponseWriter, req *Request) {
+				_, writeErr = w.Write(make([]byte, 1<<20))
+			})
+			writing = false
+		}()
+		synctest.Wait()
+		if !writing {
+			t.Fatalf("handler finished writing response (should have blocked)")
+		}
+
+		conn.conn.Peer().SetReadError(errors.New("connection reset"))
+		synctest.Wait()
+		if writing {
+			t.Fatalf("handler still blocked writing response after connection read error")
+		}
+		if writeErr == nil {
+			t.Errorf("handler wrote response successfully, want error")
 		}
 	})
 }
