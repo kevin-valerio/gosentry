@@ -5,7 +5,7 @@ go 1.27
 require (
 	go.uber.org/goleak v1.3.0
 	golang.org/x/crypto v0.55.0
-	golang.org/x/net v0.58.1-0.20260825222430-bf481657f8f2
+	golang.org/x/net v0.58.1-0.20260828192815-d34deae423f9
 )
 
 require (

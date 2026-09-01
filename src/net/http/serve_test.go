@@ -908,7 +908,7 @@ func testServerReadHeaderTimeoutIsCleared(t *testing.T, mode testMode) {
 	}
 }
 
-func TestServerReadTimeout(t *testing.T) { run(t, testServerReadTimeout, http3SkippedMode) }
+func TestServerReadTimeout(t *testing.T) { run(t, testServerReadTimeout) }
 func testServerReadTimeout(t *testing.T, mode testMode) {
 	respBody := "response body"
 	for timeout := 5 * time.Millisecond; ; timeout *= 2 {
@@ -949,10 +949,7 @@ func testServerReadTimeout(t *testing.T, mode testMode) {
 	}
 }
 
-func TestServerNoReadTimeout(t *testing.T) {
-	// Flaky on HTTP/3.
-	run(t, testServerNoReadTimeout, http3SkippedMode)
-}
+func TestServerNoReadTimeout(t *testing.T) { run(t, testServerNoReadTimeout) }
 func testServerNoReadTimeout(t *testing.T, mode testMode) {
 	reqBody := "Hello, Gophers!"
 	resBody := "Hi, Gophers!"
@@ -996,7 +993,7 @@ func testServerNoReadTimeout(t *testing.T, mode testMode) {
 	}
 }
 
-func TestServerWriteTimeout(t *testing.T) { runSynctest(t, testServerWriteTimeout, http3SkippedMode) }
+func TestServerWriteTimeout(t *testing.T) { runSynctest(t, testServerWriteTimeout) }
 func testServerWriteTimeout(t *testing.T, mode testMode) {
 	const timeout = 1 * time.Second
 	handlerDone := false
@@ -1147,7 +1144,7 @@ func TestWriteDeadlineEnforcedPerStream(t *testing.T) {
 		tryTimeouts(t, func(timeout time.Duration) error {
 			return testWriteDeadlineEnforcedPerStream(t, mode, timeout)
 		})
-	}, http3SkippedMode)
+	})
 }
 
 func testWriteDeadlineEnforcedPerStream(t *testing.T, mode testMode, timeout time.Duration) error {
@@ -4641,11 +4638,7 @@ func testTransportAndServerSharedBodyRace(t *testing.T, mode testMode) {
 			// cause the server to close req.Body. Since they are the same underlying
 			// ReadCloser, that will result in concurrent calls to Close (and possibly a
 			// Read concurrent with a Close).
-			if mode == http2Mode {
-				close(cancel)
-			} else {
-				proxy.c.Transport.(*Transport).CancelRequest(req2)
-			}
+			close(cancel)
 			rw.Write([]byte("OK"))
 		}), optRealNet)
 		defer proxy.close()
@@ -5493,7 +5486,7 @@ func testServerRequestContextCancel_ConnClose(t *testing.T, mode testMode) {
 }
 
 func TestServerContext_ServerContextKey(t *testing.T) {
-	run(t, testServerContext_ServerContextKey, http3SkippedMode)
+	run(t, testServerContext_ServerContextKey)
 }
 func testServerContext_ServerContextKey(t *testing.T, mode testMode) {
 	cst := newClientServerTest(t, mode, HandlerFunc(func(w ResponseWriter, r *Request) {
@@ -6922,9 +6915,7 @@ func testUnsupportedTransferEncodingsReturn501(t *testing.T, mode testMode) {
 }
 
 // Issue 31753: don't sniff when Content-Encoding is set
-func TestContentEncodingNoSniffing(t *testing.T) {
-	run(t, testContentEncodingNoSniffing, http3SkippedMode)
-}
+func TestContentEncodingNoSniffing(t *testing.T) { run(t, testContentEncodingNoSniffing) }
 func testContentEncodingNoSniffing(t *testing.T, mode testMode) {
 	type setting struct {
 		name string
@@ -7506,7 +7497,7 @@ func TestProcessing(t *testing.T) {
 	}
 }
 
-func TestParseFormCleanup(t *testing.T) { run(t, testParseFormCleanup, http3SkippedMode) }
+func TestParseFormCleanup(t *testing.T) { run(t, testParseFormCleanup) }
 func testParseFormCleanup(t *testing.T, mode testMode) {
 	const maxMemory = 1024
 	const key = "file"
