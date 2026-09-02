@@ -7248,6 +7248,12 @@ const (
 	OpConcatPermuteUint8x16
 	OpConcatPermuteUint8x32
 	OpConcatPermuteUint8x64
+	OpConcatSaturateToInt16GroupedInt32x16
+	OpConcatSaturateToInt16GroupedInt32x8
+	OpConcatSaturateToInt16Int32x4
+	OpConcatSaturateToUint16GroupedInt32x16
+	OpConcatSaturateToUint16GroupedInt32x8
+	OpConcatSaturateToUint16Int32x4
 	OpConcatShiftBytesRightGroupedUint8x32
 	OpConcatShiftBytesRightGroupedUint8x64
 	OpConcatShiftBytesRightUint8x16
@@ -8023,9 +8029,6 @@ const (
 	OpSHA256Message1Uint32x4
 	OpSHA256Message2Uint32x4
 	OpSHA256TwoRoundsUint32x4
-	OpSaturateToInt16ConcatGroupedInt32x16
-	OpSaturateToInt16ConcatGroupedInt32x8
-	OpSaturateToInt16ConcatInt32x4
 	OpSaturateToInt16Int32x16
 	OpSaturateToInt16Int32x4
 	OpSaturateToInt16Int32x8
@@ -8044,9 +8047,6 @@ const (
 	OpSaturateToInt8Int64x2
 	OpSaturateToInt8Int64x4
 	OpSaturateToInt8Int64x8
-	OpSaturateToUint16ConcatGroupedInt32x16
-	OpSaturateToUint16ConcatGroupedInt32x8
-	OpSaturateToUint16ConcatInt32x4
 	OpSaturateToUint16Int32x4
 	OpSaturateToUint16Uint32x16
 	OpSaturateToUint16Uint32x4
@@ -97300,11 +97300,10 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:           "LoweredZero",
-		AuxType:        AuxTypeSymValAndOff,
+		AuxType:        AuxTypeSizeAndAlign,
 		ArgLen:         2,
 		FaultOnNilArg0: true,
 		AddrSinkArg0:   true,
-		symEffect:      SymWrite,
 		Reg: RegInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 1006632944, V2: 0}}, // X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20 X21 X22 X23 X24 X25 X26 X28 X29 X30
@@ -97313,12 +97312,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:           "LoweredZeroLoop",
-		AuxType:        AuxTypeSymValAndOff,
+		AuxType:        AuxTypeSizeAndAlign,
 		ArgLen:         2,
 		NeedIntTemp:    true,
 		FaultOnNilArg0: true,
 		AddrSinkArg0:   true,
-		symEffect:      SymWrite,
 		Reg: RegInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 1006632944, V2: 0}}, // X5 X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20 X21 X22 X23 X24 X25 X26 X28 X29 X30
@@ -97328,13 +97326,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:           "LoweredMove",
-		AuxType:        AuxTypeSymValAndOff,
+		AuxType:        AuxTypeSizeAndAlign,
 		ArgLen:         3,
 		FaultOnNilArg0: true,
 		FaultOnNilArg1: true,
 		AddrSinkArg0:   true,
 		AddrSinkArg1:   true,
-		symEffect:      SymWrite,
 		Reg: RegInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 1006632928, V2: 0}}, // X6 X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20 X21 X22 X23 X24 X25 X26 X28 X29 X30
@@ -97345,13 +97342,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:           "LoweredMoveLoop",
-		AuxType:        AuxTypeSymValAndOff,
+		AuxType:        AuxTypeSizeAndAlign,
 		ArgLen:         3,
 		FaultOnNilArg0: true,
 		FaultOnNilArg1: true,
 		AddrSinkArg0:   true,
 		AddrSinkArg1:   true,
-		symEffect:      SymWrite,
 		Reg: RegInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 1006632896, V2: 0}}, // X7 X8 X9 X10 X11 X12 X13 X14 X15 X16 X17 X18 X19 X20 X21 X22 X23 X24 X25 X26 X28 X29 X30
@@ -110831,6 +110827,36 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "ConcatSaturateToInt16GroupedInt32x16",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "ConcatSaturateToInt16GroupedInt32x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "ConcatSaturateToInt16Int32x4",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "ConcatSaturateToUint16GroupedInt32x16",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "ConcatSaturateToUint16GroupedInt32x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "ConcatSaturateToUint16Int32x4",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "ConcatShiftBytesRightGroupedUint8x32",
 		AuxType: AuxTypeUInt8,
 		ArgLen:  2,
@@ -114934,21 +114960,6 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
-		Name:    "SaturateToInt16ConcatGroupedInt32x16",
-		ArgLen:  2,
-		Generic: true,
-	},
-	{
-		Name:    "SaturateToInt16ConcatGroupedInt32x8",
-		ArgLen:  2,
-		Generic: true,
-	},
-	{
-		Name:    "SaturateToInt16ConcatInt32x4",
-		ArgLen:  2,
-		Generic: true,
-	},
-	{
 		Name:    "SaturateToInt16Int32x16",
 		ArgLen:  1,
 		Generic: true,
@@ -115036,21 +115047,6 @@ var OpcodeTable = [...]OpInfo{
 	{
 		Name:    "SaturateToInt8Int64x8",
 		ArgLen:  1,
-		Generic: true,
-	},
-	{
-		Name:    "SaturateToUint16ConcatGroupedInt32x16",
-		ArgLen:  2,
-		Generic: true,
-	},
-	{
-		Name:    "SaturateToUint16ConcatGroupedInt32x8",
-		ArgLen:  2,
-		Generic: true,
-	},
-	{
-		Name:    "SaturateToUint16ConcatInt32x4",
-		ArgLen:  2,
 		Generic: true,
 	},
 	{

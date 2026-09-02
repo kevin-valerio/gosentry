@@ -125,6 +125,15 @@ type limitFact struct {
 	limit ssa.Limit
 }
 
+// a constDeltaAdd encodes non-over/underflowing additions like v = w + delta.
+type constDeltaAdd struct {
+	next *constDeltaAdd
+	// Note: w is implicit here, determined by which additions map entry it is in (additions[w.ID]).
+	v     *ssa.Value
+	delta int64
+	d     domain // signed or unsigned
+}
+
 // An ordering encodes facts like v < w.
 type ordering struct {
 	next *ordering // linked list of all known orderings for v.
@@ -156,6 +165,13 @@ type factsTable struct {
 	// domain.
 	orderS *ssa.Poset
 	orderU *ssa.Poset
+
+	// additions maps a base Value ID to a linked list of known additions.
+	// additions[w.ID] is the list of known values v such that v = w + delta,
+	// where delta is a constant.
+	additions      map[ssa.ID]*constDeltaAdd
+	additionsStack []ssa.ID       // undo stack
+	additionCache  *constDeltaAdd // free list
 
 	// orderings contains a list of known orderings between values.
 	// These lists are indexed by v.ID.
@@ -191,6 +207,8 @@ func newFactsTable(f *ssa.Func) *factsTable {
 	ft := &factsTable{}
 	ft.orderS = f.NewPoset()
 	ft.orderU = f.NewPoset()
+	ft.additions = make(map[ssa.ID]*constDeltaAdd)
+	ft.additionsStack = make([]ssa.ID, 0, 64)
 	ft.orderings = make(map[ssa.ID]*ordering)
 	ft.limits = f.Cache.AllocLimitSlice(f.NumValues())
 	for _, b := range f.Blocks {
@@ -905,6 +923,7 @@ func (ft *factsTable) checkpoint() {
 	ft.limitStack = append(ft.limitStack, checkpointBound)
 	ft.orderS.Checkpoint()
 	ft.orderU.Checkpoint()
+	ft.additionsStack = append(ft.additionsStack, 0)
 	ft.orderingsStack = append(ft.orderingsStack, 0)
 }
 
@@ -927,6 +946,17 @@ func (ft *factsTable) restore() {
 	}
 	ft.orderS.Undo()
 	ft.orderU.Undo()
+	for {
+		id := ft.additionsStack[len(ft.additionsStack)-1]
+		ft.additionsStack = ft.additionsStack[:len(ft.additionsStack)-1]
+		if id == 0 { // checkpoint marker
+			break
+		}
+		a := ft.additions[id]
+		ft.additions[id] = a.next
+		a.next = ft.additionCache
+		ft.additionCache = a
+	}
 	for {
 		id := ft.orderingsStack[len(ft.orderingsStack)-1]
 		ft.orderingsStack = ft.orderingsStack[:len(ft.orderingsStack)-1]
@@ -1207,6 +1237,7 @@ func getSliceInfo(vp *ssa.Value) (inf sliceInfo) {
 func prove(f *ssa.Func) {
 	// Find induction variables.
 	var indVars map[*ssa.Block][]indVar
+	var headerIndVars map[*ssa.Block][]indVar
 	for _, v := range findIndVar(f) {
 		ind := v.ind
 		if len(ind.Args) != 2 {
@@ -1220,8 +1251,10 @@ func prove(f *ssa.Func) {
 			// ind or nxt is used inside the loop, add it for the facts table
 			if indVars == nil {
 				indVars = make(map[*ssa.Block][]indVar)
+				headerIndVars = make(map[*ssa.Block][]indVar)
 			}
 			indVars[v.entry] = append(indVars[v.entry], v)
+			headerIndVars[ind.Block] = append(headerIndVars[ind.Block], v)
 			continue
 		} else {
 			// Since this induction variable is not used for anything but counting the iterations,
@@ -1313,6 +1346,11 @@ func prove(f *ssa.Func) {
 			// that is bound to this block.
 			for _, iv := range indVars[node.block] {
 				addIndVarRestrictions(ft, parent, iv)
+			}
+
+			// Entering a loop header block, add facts about the induction variables' init bounds.
+			for _, iv := range headerIndVars[node.block] {
+				addIndVarInitRestrictions(ft, parent, iv)
 			}
 
 			// Add results of reaching this block via a branch from
@@ -1768,6 +1806,33 @@ func getBranch(sdom ssa.SparseTree, p *ssa.Block, b *ssa.Block) branch {
 	return unknown
 }
 
+// addIndVarInitRestrictions updates the factsTables ft with the init value
+// learned from the induction variable indVar which drives the loop
+// starting in Block b.
+func addIndVarInitRestrictions(ft *factsTable, b *ssa.Block, iv indVar) {
+	if iv.flags&indVarDownward == 0 {
+		// upward counting loop, the init value is the min
+		d := signed
+		if ft.isNonNegative(iv.min) {
+			d |= unsigned
+		}
+		if iv.flags&indVarMinExc == 0 {
+			addRestrictions(b, ft, d, iv.min, iv.ind, lt|eq)
+		} else {
+			addRestrictions(b, ft, d, iv.min, iv.ind, lt)
+		}
+	} else {
+		// downward counting loop, the init value is the max.
+		// We must only use signed domain because iv.ind can become
+		// negative on the exit iteration, violating unsigned iv.ind <= iv.max.
+		if iv.flags&indVarMaxInc == 0 {
+			addRestrictions(b, ft, signed, iv.ind, iv.max, lt)
+		} else {
+			addRestrictions(b, ft, signed, iv.ind, iv.max, lt|eq)
+		}
+	}
+}
+
 // addIndVarRestrictions updates the factsTables ft with the facts
 // learned from the induction variable indVar which drives the loop
 // starting in Block b.
@@ -1980,6 +2045,7 @@ func (ft *factsTable) addValueFact(b *ssa.Block, v *ssa.Value) {
 			}
 			ft.update(b, v, v.Args[0], signed, r)
 		}
+		ft.compareConstDelta(b, v)
 	case ssaop.OpSub64, ssaop.OpSub32, ssaop.OpSub16, ssaop.OpSub8:
 		x := ft.limits[v.Args[0].ID]
 		y := ft.limits[v.Args[1].ID]
@@ -1990,6 +2056,7 @@ func (ft *factsTable) addValueFact(b *ssa.Block, v *ssa.Value) {
 			}
 			ft.update(b, v, v.Args[0], unsigned, r)
 		}
+		ft.compareConstDelta(b, v)
 		// FIXME: we could also do signed facts but the overflow checks are much trickier and I don't need it yet.
 	case ssaop.OpAnd64, ssaop.OpAnd32, ssaop.OpAnd16, ssaop.OpAnd8:
 		ft.update(b, v, v.Args[0], unsigned, lt|eq)
@@ -2639,6 +2706,72 @@ func isConstDelta(v *ssa.Value) (w *ssa.Value, delta int64) {
 		}
 	}
 	return nil, 0
+}
+
+// recordAddition records a relationship v = w + delta for domain d, delta can be negative.
+// This addition must be non-over/underflowing.
+func (ft *factsTable) recordAddition(w *ssa.Value, v *ssa.Value, delta int64, d domain) {
+	a := ft.additionCache
+	if a == nil {
+		a = &constDeltaAdd{}
+	} else {
+		ft.additionCache = a.next
+	}
+	a.v = v
+	a.delta = delta
+	a.d = d
+	a.next = ft.additions[w.ID]
+	ft.additions[w.ID] = a
+	ft.additionsStack = append(ft.additionsStack, w.ID)
+}
+
+// compareConstDelta tries to add a relation between v1 = w + delta1 and v2 = w + delta2.
+// This function also records this addition.
+func (ft *factsTable) compareConstDelta(b *ssa.Block, v1 *ssa.Value) {
+	w, delta1 := isConstDelta(v1)
+	if w == nil {
+		return
+	}
+	domains := make([]domain, 0)
+	// Check for over/underflows.
+	// unsigned domain
+	lim := ft.limits[w.ID]
+	if (delta1 > 0 && !unsignedAddOverflows(lim.Umax, uint64(delta1), w.Type)) ||
+		(delta1 < 0 && !unsignedSubUnderflows(lim.Umin, uint64(-delta1))) {
+		domains = append(domains, unsigned)
+	}
+	// signed domain
+	if !signedAddOverflowsOrUnderflows(lim.Max, delta1, w.Type) &&
+		!signedAddOverflowsOrUnderflows(lim.Min, delta1, w.Type) {
+		domains = append(domains, signed)
+	}
+	for _, d := range domains {
+		var bestLowerBound, bestUpperBound *ssa.Value
+		maxDelta := int64(math.MinInt64)
+		minDelta := int64(math.MaxInt64)
+
+		for a := ft.additions[w.ID]; a != nil; a = a.next {
+			if a.d != d {
+				continue
+			}
+			delta2 := a.delta
+			// pick the tightest delta2 to avoid quadratic comparisons.
+			if delta2 < delta1 && delta2 > maxDelta {
+				bestLowerBound = a.v
+				maxDelta = delta2
+			} else if delta2 > delta1 && delta2 < minDelta {
+				bestUpperBound = a.v
+				minDelta = delta2
+			}
+		}
+		if bestLowerBound != nil {
+			ft.update(b, v1, bestLowerBound, d, gt)
+		}
+		if bestUpperBound != nil {
+			ft.update(b, bestUpperBound, v1, d, gt)
+		}
+		ft.recordAddition(w, v1, delta1, d)
+	}
 }
 
 // isCleanExt reports whether v is the result of a value-preserving
