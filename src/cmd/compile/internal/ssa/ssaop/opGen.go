@@ -5040,6 +5040,14 @@ const (
 	OpARM64VUSHR4S
 	OpARM64VUSHR8H
 	OpARM64VUSHR16B
+	OpARM64ZABSB
+	OpARM64ZABSD
+	OpARM64ZABSH
+	OpARM64ZABSMergingB
+	OpARM64ZABSMergingD
+	OpARM64ZABSMergingH
+	OpARM64ZABSMergingS
+	OpARM64ZABSS
 	OpARM64ZADDB
 	OpARM64ZADDD
 	OpARM64ZADDH
@@ -5052,16 +5060,103 @@ const (
 	OpARM64ZADDMergingPrefixedS
 	OpARM64ZADDMergingS
 	OpARM64ZADDS
+	OpARM64ZANDD
+	OpARM64ZANDMergingB
+	OpARM64ZANDMergingD
+	OpARM64ZANDMergingH
+	OpARM64ZANDMergingPrefixedB
+	OpARM64ZANDMergingPrefixedD
+	OpARM64ZANDMergingPrefixedH
+	OpARM64ZANDMergingPrefixedS
+	OpARM64ZANDMergingS
+	OpARM64ZCMPEQB
+	OpARM64ZCMPEQD
+	OpARM64ZCMPEQH
+	OpARM64ZCMPEQS
+	OpARM64ZCMPGEB
+	OpARM64ZCMPGED
+	OpARM64ZCMPGEH
+	OpARM64ZCMPGES
 	OpARM64ZCMPGTB
 	OpARM64ZCMPGTD
 	OpARM64ZCMPGTH
 	OpARM64ZCMPGTS
+	OpARM64ZCMPHIB
+	OpARM64ZCMPHID
+	OpARM64ZCMPHIH
+	OpARM64ZCMPHIS
+	OpARM64ZCMPHSB
+	OpARM64ZCMPHSD
+	OpARM64ZCMPHSH
+	OpARM64ZCMPHSS
+	OpARM64ZCMPNEB
+	OpARM64ZCMPNED
+	OpARM64ZCMPNEH
+	OpARM64ZCMPNES
+	OpARM64ZEORD
+	OpARM64ZEORMergingB
+	OpARM64ZEORMergingD
+	OpARM64ZEORMergingH
+	OpARM64ZEORMergingPrefixedB
+	OpARM64ZEORMergingPrefixedD
+	OpARM64ZEORMergingPrefixedH
+	OpARM64ZEORMergingPrefixedS
+	OpARM64ZEORMergingS
+	OpARM64ZFABSD
+	OpARM64ZFABSMergingD
+	OpARM64ZFABSMergingS
+	OpARM64ZFABSS
 	OpARM64ZFADDD
 	OpARM64ZFADDMergingD
 	OpARM64ZFADDMergingPrefixedD
 	OpARM64ZFADDMergingPrefixedS
 	OpARM64ZFADDMergingS
 	OpARM64ZFADDS
+	OpARM64ZFCMEQD
+	OpARM64ZFCMEQS
+	OpARM64ZFCMGED
+	OpARM64ZFCMGES
+	OpARM64ZFCMGTD
+	OpARM64ZFCMGTS
+	OpARM64ZFCMNED
+	OpARM64ZFCMNES
+	OpARM64ZFNEGD
+	OpARM64ZFNEGMergingD
+	OpARM64ZFNEGMergingS
+	OpARM64ZFNEGS
+	OpARM64ZFRINTMD
+	OpARM64ZFRINTMS
+	OpARM64ZFRINTND
+	OpARM64ZFRINTNS
+	OpARM64ZFRINTPD
+	OpARM64ZFRINTPS
+	OpARM64ZFRINTZD
+	OpARM64ZFRINTZS
+	OpARM64ZFSQRTD
+	OpARM64ZFSQRTMergingD
+	OpARM64ZFSQRTMergingS
+	OpARM64ZFSQRTS
+	OpARM64ZFSUBD
+	OpARM64ZFSUBMergingD
+	OpARM64ZFSUBMergingS
+	OpARM64ZFSUBS
+	OpARM64ZNEGB
+	OpARM64ZNEGD
+	OpARM64ZNEGH
+	OpARM64ZNEGMergingB
+	OpARM64ZNEGMergingD
+	OpARM64ZNEGMergingH
+	OpARM64ZNEGMergingS
+	OpARM64ZNEGS
+	OpARM64ZORRD
+	OpARM64ZORRMergingB
+	OpARM64ZORRMergingD
+	OpARM64ZORRMergingH
+	OpARM64ZORRMergingPrefixedB
+	OpARM64ZORRMergingPrefixedD
+	OpARM64ZORRMergingPrefixedH
+	OpARM64ZORRMergingPrefixedS
+	OpARM64ZORRMergingS
 	OpARM64ZSQADDB
 	OpARM64ZSQADDD
 	OpARM64ZSQADDH
@@ -5074,6 +5169,22 @@ const (
 	OpARM64ZSQADDMergingPrefixedS
 	OpARM64ZSQADDMergingS
 	OpARM64ZSQADDS
+	OpARM64ZSQSUBB
+	OpARM64ZSQSUBD
+	OpARM64ZSQSUBH
+	OpARM64ZSQSUBMergingB
+	OpARM64ZSQSUBMergingD
+	OpARM64ZSQSUBMergingH
+	OpARM64ZSQSUBMergingS
+	OpARM64ZSQSUBS
+	OpARM64ZSUBB
+	OpARM64ZSUBD
+	OpARM64ZSUBH
+	OpARM64ZSUBMergingB
+	OpARM64ZSUBMergingD
+	OpARM64ZSUBMergingH
+	OpARM64ZSUBMergingS
+	OpARM64ZSUBS
 	OpARM64ZUQADDB
 	OpARM64ZUQADDD
 	OpARM64ZUQADDH
@@ -5086,6 +5197,14 @@ const (
 	OpARM64ZUQADDMergingPrefixedS
 	OpARM64ZUQADDMergingS
 	OpARM64ZUQADDS
+	OpARM64ZUQSUBB
+	OpARM64ZUQSUBD
+	OpARM64ZUQSUBH
+	OpARM64ZUQSUBMergingB
+	OpARM64ZUQSUBMergingD
+	OpARM64ZUQSUBMergingH
+	OpARM64ZUQSUBMergingS
+	OpARM64ZUQSUBS
 
 	OpLOONG64NEGV
 	OpLOONG64NEGF
@@ -7018,17 +7137,23 @@ const (
 	OpAESEncryptOneRoundUint8x64
 	OpAESInvMixColumnsUint32x4
 	OpAESRoundKeyGenAssistUint32x4
+	OpAbsFloat32s
 	OpAbsFloat32x4
+	OpAbsFloat64s
 	OpAbsFloat64x2
+	OpAbsInt16s
 	OpAbsInt16x16
 	OpAbsInt16x32
 	OpAbsInt16x8
+	OpAbsInt32s
 	OpAbsInt32x16
 	OpAbsInt32x4
 	OpAbsInt32x8
+	OpAbsInt64s
 	OpAbsInt64x2
 	OpAbsInt64x4
 	OpAbsInt64x8
+	OpAbsInt8s
 	OpAbsInt8x16
 	OpAbsInt8x32
 	OpAbsInt8x64
@@ -7100,15 +7225,19 @@ const (
 	OpAddUint8x16
 	OpAddUint8x32
 	OpAddUint8x64
+	OpAndInt16s
 	OpAndInt16x16
 	OpAndInt16x32
 	OpAndInt16x8
+	OpAndInt32s
 	OpAndInt32x16
 	OpAndInt32x4
 	OpAndInt32x8
+	OpAndInt64s
 	OpAndInt64x2
 	OpAndInt64x4
 	OpAndInt64x8
+	OpAndInt8s
 	OpAndInt8x16
 	OpAndInt8x32
 	OpAndInt8x64
@@ -7136,15 +7265,19 @@ const (
 	OpAndNotUint8x16
 	OpAndNotUint8x32
 	OpAndNotUint8x64
+	OpAndUint16s
 	OpAndUint16x16
 	OpAndUint16x32
 	OpAndUint16x8
+	OpAndUint32s
 	OpAndUint32x16
 	OpAndUint32x4
 	OpAndUint32x8
+	OpAndUint64s
 	OpAndUint64x2
 	OpAndUint64x4
 	OpAndUint64x8
+	OpAndUint8s
 	OpAndUint8x16
 	OpAndUint8x32
 	OpAndUint8x64
@@ -7172,8 +7305,10 @@ const (
 	OpBroadcastInt32x4
 	OpBroadcastInt64x2
 	OpBroadcastInt8x16
+	OpCeilFloat32s
 	OpCeilFloat32x4
 	OpCeilFloat32x8
+	OpCeilFloat64s
 	OpCeilFloat64x2
 	OpCeilFloat64x4
 	OpCeilScaledFloat32x16
@@ -7377,33 +7512,43 @@ const (
 	OpDotProductPairsSaturatedUint8x16
 	OpDotProductPairsSaturatedUint8x32
 	OpDotProductPairsSaturatedUint8x64
+	OpEqualFloat32s
 	OpEqualFloat32x16
 	OpEqualFloat32x4
 	OpEqualFloat32x8
+	OpEqualFloat64s
 	OpEqualFloat64x2
 	OpEqualFloat64x4
 	OpEqualFloat64x8
+	OpEqualInt16s
 	OpEqualInt16x16
 	OpEqualInt16x32
 	OpEqualInt16x8
+	OpEqualInt32s
 	OpEqualInt32x16
 	OpEqualInt32x4
 	OpEqualInt32x8
+	OpEqualInt64s
 	OpEqualInt64x2
 	OpEqualInt64x4
 	OpEqualInt64x8
+	OpEqualInt8s
 	OpEqualInt8x16
 	OpEqualInt8x32
 	OpEqualInt8x64
+	OpEqualUint16s
 	OpEqualUint16x16
 	OpEqualUint16x32
 	OpEqualUint16x8
+	OpEqualUint32s
 	OpEqualUint32x16
 	OpEqualUint32x4
 	OpEqualUint32x8
+	OpEqualUint64s
 	OpEqualUint64x2
 	OpEqualUint64x4
 	OpEqualUint64x8
+	OpEqualUint8s
 	OpEqualUint8x16
 	OpEqualUint8x32
 	OpEqualUint8x64
@@ -7479,8 +7624,10 @@ const (
 	OpExtendToUint64Uint16x8
 	OpExtendToUint64Uint32x4
 	OpExtendToUint64Uint32x8
+	OpFloorFloat32s
 	OpFloorFloat32x4
 	OpFloorFloat32x8
+	OpFloorFloat64s
 	OpFloorFloat64x2
 	OpFloorFloat64x4
 	OpFloorScaledFloat32x16
@@ -7554,31 +7701,43 @@ const (
 	OpGetLoUint64x8
 	OpGetLoUint8x32
 	OpGetLoUint8x64
+	OpGreaterEqualFloat32s
 	OpGreaterEqualFloat32x16
 	OpGreaterEqualFloat32x4
 	OpGreaterEqualFloat32x8
+	OpGreaterEqualFloat64s
 	OpGreaterEqualFloat64x2
 	OpGreaterEqualFloat64x4
 	OpGreaterEqualFloat64x8
+	OpGreaterEqualInt16s
 	OpGreaterEqualInt16x32
 	OpGreaterEqualInt16x8
+	OpGreaterEqualInt32s
 	OpGreaterEqualInt32x16
 	OpGreaterEqualInt32x4
+	OpGreaterEqualInt64s
 	OpGreaterEqualInt64x2
 	OpGreaterEqualInt64x8
+	OpGreaterEqualInt8s
 	OpGreaterEqualInt8x16
 	OpGreaterEqualInt8x64
+	OpGreaterEqualUint16s
 	OpGreaterEqualUint16x32
 	OpGreaterEqualUint16x8
+	OpGreaterEqualUint32s
 	OpGreaterEqualUint32x16
 	OpGreaterEqualUint32x4
+	OpGreaterEqualUint64s
 	OpGreaterEqualUint64x2
 	OpGreaterEqualUint64x8
+	OpGreaterEqualUint8s
 	OpGreaterEqualUint8x16
 	OpGreaterEqualUint8x64
+	OpGreaterFloat32s
 	OpGreaterFloat32x16
 	OpGreaterFloat32x4
 	OpGreaterFloat32x8
+	OpGreaterFloat64s
 	OpGreaterFloat64x2
 	OpGreaterFloat64x4
 	OpGreaterFloat64x8
@@ -7598,12 +7757,16 @@ const (
 	OpGreaterInt8x16
 	OpGreaterInt8x32
 	OpGreaterInt8x64
+	OpGreaterUint16s
 	OpGreaterUint16x32
 	OpGreaterUint16x8
+	OpGreaterUint32s
 	OpGreaterUint32x16
 	OpGreaterUint32x4
+	OpGreaterUint64s
 	OpGreaterUint64x2
 	OpGreaterUint64x8
+	OpGreaterUint8s
 	OpGreaterUint8x16
 	OpGreaterUint8x64
 	OpInterleaveEvenInt16x8
@@ -7874,32 +8037,48 @@ const (
 	OpMulWidenLoUint16x8
 	OpMulWidenLoUint32x4
 	OpMulWidenLoUint8x16
+	OpNegFloat32s
 	OpNegFloat32x4
+	OpNegFloat64s
 	OpNegFloat64x2
+	OpNegInt16s
 	OpNegInt16x8
+	OpNegInt32s
 	OpNegInt32x4
+	OpNegInt64s
 	OpNegInt64x2
+	OpNegInt8s
 	OpNegInt8x16
+	OpNotEqualFloat32s
 	OpNotEqualFloat32x16
 	OpNotEqualFloat32x4
 	OpNotEqualFloat32x8
+	OpNotEqualFloat64s
 	OpNotEqualFloat64x2
 	OpNotEqualFloat64x4
 	OpNotEqualFloat64x8
+	OpNotEqualInt16s
 	OpNotEqualInt16x32
 	OpNotEqualInt16x8
+	OpNotEqualInt32s
 	OpNotEqualInt32x16
 	OpNotEqualInt32x4
+	OpNotEqualInt64s
 	OpNotEqualInt64x2
 	OpNotEqualInt64x8
+	OpNotEqualInt8s
 	OpNotEqualInt8x16
 	OpNotEqualInt8x64
+	OpNotEqualUint16s
 	OpNotEqualUint16x32
 	OpNotEqualUint16x8
+	OpNotEqualUint32s
 	OpNotEqualUint32x16
 	OpNotEqualUint32x4
+	OpNotEqualUint64s
 	OpNotEqualUint64x2
 	OpNotEqualUint64x8
+	OpNotEqualUint8s
 	OpNotEqualUint8x16
 	OpNotEqualUint8x64
 	OpNotInt16x8
@@ -7934,15 +8113,19 @@ const (
 	OpOnesCountUint8x16
 	OpOnesCountUint8x32
 	OpOnesCountUint8x64
+	OpOrInt16s
 	OpOrInt16x16
 	OpOrInt16x32
 	OpOrInt16x8
+	OpOrInt32s
 	OpOrInt32x16
 	OpOrInt32x4
 	OpOrInt32x8
+	OpOrInt64s
 	OpOrInt64x2
 	OpOrInt64x4
 	OpOrInt64x8
+	OpOrInt8s
 	OpOrInt8x16
 	OpOrInt8x32
 	OpOrInt8x64
@@ -7954,15 +8137,19 @@ const (
 	OpOrNotUint32x4
 	OpOrNotUint64x2
 	OpOrNotUint8x16
+	OpOrUint16s
 	OpOrUint16x16
 	OpOrUint16x32
 	OpOrUint16x8
+	OpOrUint32s
 	OpOrUint32x16
 	OpOrUint32x4
 	OpOrUint32x8
+	OpOrUint64s
 	OpOrUint64x2
 	OpOrUint64x4
 	OpOrUint64x8
+	OpOrUint8s
 	OpOrUint8x16
 	OpOrUint8x32
 	OpOrUint8x64
@@ -8048,8 +8235,10 @@ const (
 	OpRotateRightUint64x2
 	OpRotateRightUint64x4
 	OpRotateRightUint64x8
+	OpRoundFloat32s
 	OpRoundFloat32x4
 	OpRoundFloat32x8
+	OpRoundFloat64s
 	OpRoundFloat64x2
 	OpRoundFloat64x4
 	OpRoundScaledFloat32x16
@@ -8330,63 +8519,85 @@ const (
 	OpShiftUint32x4
 	OpShiftUint64x2
 	OpShiftUint8x16
+	OpSqrtFloat32s
 	OpSqrtFloat32x16
 	OpSqrtFloat32x4
 	OpSqrtFloat32x8
+	OpSqrtFloat64s
 	OpSqrtFloat64x2
 	OpSqrtFloat64x4
 	OpSqrtFloat64x8
+	OpSubFloat32s
 	OpSubFloat32x16
 	OpSubFloat32x4
 	OpSubFloat32x8
+	OpSubFloat64s
 	OpSubFloat64x2
 	OpSubFloat64x4
 	OpSubFloat64x8
+	OpSubInt16s
 	OpSubInt16x16
 	OpSubInt16x32
 	OpSubInt16x8
+	OpSubInt32s
 	OpSubInt32x16
 	OpSubInt32x4
 	OpSubInt32x8
+	OpSubInt64s
 	OpSubInt64x2
 	OpSubInt64x4
 	OpSubInt64x8
+	OpSubInt8s
 	OpSubInt8x16
 	OpSubInt8x32
 	OpSubInt8x64
+	OpSubSaturatedInt16s
 	OpSubSaturatedInt16x16
 	OpSubSaturatedInt16x32
 	OpSubSaturatedInt16x8
+	OpSubSaturatedInt32s
 	OpSubSaturatedInt32x4
+	OpSubSaturatedInt64s
 	OpSubSaturatedInt64x2
+	OpSubSaturatedInt8s
 	OpSubSaturatedInt8x16
 	OpSubSaturatedInt8x32
 	OpSubSaturatedInt8x64
+	OpSubSaturatedUint16s
 	OpSubSaturatedUint16x16
 	OpSubSaturatedUint16x32
 	OpSubSaturatedUint16x8
+	OpSubSaturatedUint32s
 	OpSubSaturatedUint32x4
+	OpSubSaturatedUint64s
 	OpSubSaturatedUint64x2
+	OpSubSaturatedUint8s
 	OpSubSaturatedUint8x16
 	OpSubSaturatedUint8x32
 	OpSubSaturatedUint8x64
+	OpSubUint16s
 	OpSubUint16x16
 	OpSubUint16x32
 	OpSubUint16x8
+	OpSubUint32s
 	OpSubUint32x16
 	OpSubUint32x4
 	OpSubUint32x8
+	OpSubUint64s
 	OpSubUint64x2
 	OpSubUint64x4
 	OpSubUint64x8
+	OpSubUint8s
 	OpSubUint8x16
 	OpSubUint8x32
 	OpSubUint8x64
 	OpSumOf8AbsDiffUint8x16
 	OpSumOf8AbsDiffUint8x32
 	OpSumOf8AbsDiffUint8x64
+	OpTruncFloat32s
 	OpTruncFloat32x4
 	OpTruncFloat32x8
+	OpTruncFloat64s
 	OpTruncFloat64x2
 	OpTruncFloat64x4
 	OpTruncScaledFloat32x16
@@ -8437,27 +8648,35 @@ const (
 	OpTruncToUint8Uint64x2
 	OpTruncToUint8Uint64x4
 	OpTruncToUint8Uint64x8
+	OpXorInt16s
 	OpXorInt16x16
 	OpXorInt16x32
 	OpXorInt16x8
+	OpXorInt32s
 	OpXorInt32x16
 	OpXorInt32x4
 	OpXorInt32x8
+	OpXorInt64s
 	OpXorInt64x2
 	OpXorInt64x4
 	OpXorInt64x8
+	OpXorInt8s
 	OpXorInt8x16
 	OpXorInt8x32
 	OpXorInt8x64
+	OpXorUint16s
 	OpXorUint16x16
 	OpXorUint16x32
 	OpXorUint16x8
+	OpXorUint32s
 	OpXorUint32x16
 	OpXorUint32x4
 	OpXorUint32x8
+	OpXorUint64s
 	OpXorUint64x2
 	OpXorUint64x4
 	OpXorUint64x8
+	OpXorUint8s
 	OpXorUint8x16
 	OpXorUint8x32
 	OpXorUint8x64
@@ -85679,6 +85898,126 @@ var OpcodeTable = [...]OpInfo{
 		},
 	},
 	{
+		Name:   "ZABSB",
+		ArgLen: 2,
+		asm:    arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZABSD",
+		ArgLen: 2,
+		asm:    arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZABSH",
+		ArgLen: 2,
+		asm:    arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZABSMergingB",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZABSMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZABSMergingH",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZABSMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZABSS",
+		ArgLen: 2,
+		asm:    arm64.AZABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		Name:        "ZADDB",
 		ArgLen:      2,
 		Commutative: true,
@@ -85871,6 +86210,277 @@ var OpcodeTable = [...]OpInfo{
 		},
 	},
 	{
+		Name:        "ZANDD",
+		ArgLen:      2,
+		Commutative: true,
+		asm:         arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZANDMergingB",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZANDMergingD",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZANDMergingH",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZANDMergingPrefixedB",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZANDMergingPrefixedD",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZANDMergingPrefixedH",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZANDMergingPrefixedS",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZANDMergingS",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZAND,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZCMPEQB",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPEQD",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPEQH",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPEQS",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPGEB",
+		ArgLen: 3,
+		asm:    arm64.AZCMPGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPGED",
+		ArgLen: 3,
+		asm:    arm64.AZCMPGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPGEH",
+		ArgLen: 3,
+		asm:    arm64.AZCMPGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPGES",
+		ArgLen: 3,
+		asm:    arm64.AZCMPGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
 		Name:   "ZCMPGTB",
 		ArgLen: 3,
 		asm:    arm64.AZCMPGT,
@@ -85927,6 +86537,397 @@ var OpcodeTable = [...]OpInfo{
 			},
 			Outputs: []OutputInfo{
 				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHIB",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHI,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHID",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHI,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHIH",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHI,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHIS",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHI,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHSB",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHSD",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHSH",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZCMPHSS",
+		ArgLen: 3,
+		asm:    arm64.AZCMPHS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPNEB",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPNED",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPNEH",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZCMPNES",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZCMPNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZEORD",
+		ArgLen:      2,
+		Commutative: true,
+		asm:         arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZEORMergingB",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZEORMergingD",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZEORMergingH",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZEORMergingPrefixedB",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZEORMergingPrefixedD",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZEORMergingPrefixedH",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZEORMergingPrefixedS",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZEORMergingS",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZEOR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFABSD",
+		ArgLen: 2,
+		asm:    arm64.AZFABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFABSMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFABSMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFABSS",
+		ArgLen: 2,
+		asm:    arm64.AZFABS,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
 			},
 		},
 	},
@@ -86020,6 +87021,689 @@ var OpcodeTable = [...]OpInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
 				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZFCMEQD",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZFCMEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZFCMEQS",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZFCMEQ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZFCMGED",
+		ArgLen: 3,
+		asm:    arm64.AZFCMGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZFCMGES",
+		ArgLen: 3,
+		asm:    arm64.AZFCMGE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZFCMGTD",
+		ArgLen: 3,
+		asm:    arm64.AZFCMGT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZFCMGTS",
+		ArgLen: 3,
+		asm:    arm64.AZFCMGT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZFCMNED",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZFCMNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:        "ZFCMNES",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZFCMNE,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+			},
+		},
+	},
+	{
+		Name:   "ZFNEGD",
+		ArgLen: 2,
+		asm:    arm64.AZFNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFNEGMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFNEGMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFNEGS",
+		ArgLen: 2,
+		asm:    arm64.AZFNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTMD",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTM,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTMS",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTM,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTND",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTN,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTNS",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTN,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTPD",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTP,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTPS",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTP,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTZD",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTZ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFRINTZS",
+		ArgLen: 2,
+		asm:    arm64.AZFRINTZ,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFSQRTD",
+		ArgLen: 2,
+		asm:    arm64.AZFSQRT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFSQRTMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFSQRT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFSQRTMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFSQRT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFSQRTS",
+		ArgLen: 2,
+		asm:    arm64.AZFSQRT,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFSUBD",
+		ArgLen: 2,
+		asm:    arm64.AZFSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFSUBMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZFSUBMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZFSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZFSUBS",
+		ArgLen: 2,
+		asm:    arm64.AZFSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZNEGB",
+		ArgLen: 2,
+		asm:    arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZNEGD",
+		ArgLen: 2,
+		asm:    arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZNEGH",
+		ArgLen: 2,
+		asm:    arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZNEGMergingB",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZNEGMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZNEGMergingH",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZNEGMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZNEGS",
+		ArgLen: 2,
+		asm:    arm64.AZNEG,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{1, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZORRD",
+		ArgLen:      2,
+		Commutative: true,
+		asm:         arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZORRMergingB",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZORRMergingD",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZORRMergingH",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZORRMergingPrefixedB",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZORRMergingPrefixedD",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZORRMergingPrefixedH",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZORRMergingPrefixedS",
+		ArgLen:       4,
+		ResultInArg0: true,
+		asm:          arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{3, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{2, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:        "ZORRMergingS",
+		ArgLen:      3,
+		Commutative: true,
+		asm:         arm64.AZORR,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
 			},
 			Outputs: []OutputInfo{
 				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
@@ -86219,6 +87903,246 @@ var OpcodeTable = [...]OpInfo{
 		},
 	},
 	{
+		Name:   "ZSQSUBB",
+		ArgLen: 2,
+		asm:    arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSQSUBD",
+		ArgLen: 2,
+		asm:    arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSQSUBH",
+		ArgLen: 2,
+		asm:    arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSQSUBMergingB",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSQSUBMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSQSUBMergingH",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSQSUBMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSQSUBS",
+		ArgLen: 2,
+		asm:    arm64.AZSQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSUBB",
+		ArgLen: 2,
+		asm:    arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSUBD",
+		ArgLen: 2,
+		asm:    arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSUBH",
+		ArgLen: 2,
+		asm:    arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSUBMergingB",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSUBMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSUBMergingH",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZSUBMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZSUBS",
+		ArgLen: 2,
+		asm:    arm64.AZSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
 		Name:        "ZUQADDB",
 		ArgLen:      2,
 		Commutative: true,
@@ -86400,6 +88324,126 @@ var OpcodeTable = [...]OpInfo{
 		ArgLen:      2,
 		Commutative: true,
 		asm:         arm64.AZUQADD,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZUQSUBB",
+		ArgLen: 2,
+		asm:    arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZUQSUBD",
+		ArgLen: 2,
+		asm:    arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZUQSUBH",
+		ArgLen: 2,
+		asm:    arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZUQSUBMergingB",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZUQSUBMergingD",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZUQSUBMergingH",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:         "ZUQSUBMergingS",
+		ArgLen:       3,
+		ResultInArg0: true,
+		asm:          arm64.AZUQSUB,
+		Reg: RegInfo{
+			Inputs: []InputInfo{
+				{2, RegMask{V1: 9223372036854775808, V2: 32767}}, // P0 P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 P13 P14 P15
+				{0, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+				{1, RegMask{V1: 9223372034707292160, V2: 0}},     // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+			Outputs: []OutputInfo{
+				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
+			},
+		},
+	},
+	{
+		Name:   "ZUQSUBS",
+		ArgLen: 2,
+		asm:    arm64.AZUQSUB,
 		Reg: RegInfo{
 			Inputs: []InputInfo{
 				{0, RegMask{V1: 9223372034707292160, V2: 0}}, // F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 F14 F15 F16 F17 F18 F19 F20 F21 F22 F23 F24 F25 F26 F27 F28 F29 F30 F31
@@ -109961,12 +112005,27 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "AbsFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "AbsFloat32x4",
 		ArgLen:  1,
 		Generic: true,
 	},
 	{
+		Name:    "AbsFloat64s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "AbsFloat64x2",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "AbsInt16s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -109986,6 +112045,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "AbsInt32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "AbsInt32x16",
 		ArgLen:  1,
 		Generic: true,
@@ -110001,6 +112065,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "AbsInt64s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "AbsInt64x2",
 		ArgLen:  1,
 		Generic: true,
@@ -110012,6 +112081,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "AbsInt64x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "AbsInt8s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -110435,6 +112509,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "AndInt16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "AndInt16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -110448,6 +112528,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "AndInt16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "AndInt32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -110471,6 +112557,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "AndInt64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "AndInt64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -110484,6 +112576,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "AndInt64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "AndInt8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -110627,6 +112725,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:        "AndUint16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "AndUint16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -110640,6 +112744,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "AndUint16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "AndUint32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -110663,6 +112773,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "AndUint64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "AndUint64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -110676,6 +112792,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "AndUint64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "AndUint8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -110829,12 +112951,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "CeilFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "CeilFloat32x4",
 		ArgLen:  1,
 		Generic: true,
 	},
 	{
 		Name:    "CeilFloat32x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "CeilFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -111879,6 +114011,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:        "EqualFloat32s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "EqualFloat32x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -111892,6 +114030,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "EqualFloat32x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "EqualFloat64s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -111915,6 +114059,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "EqualInt16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "EqualInt16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -111928,6 +114078,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "EqualInt16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "EqualInt32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -111951,6 +114107,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "EqualInt64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "EqualInt64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -111964,6 +114126,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "EqualInt64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "EqualInt8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -111987,6 +114155,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "EqualUint16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "EqualUint16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -112000,6 +114174,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "EqualUint16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "EqualUint32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -112023,6 +114203,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "EqualUint64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "EqualUint64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -112036,6 +114222,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "EqualUint64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "EqualUint8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -112419,12 +114611,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "FloorFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "FloorFloat32x4",
 		ArgLen:  1,
 		Generic: true,
 	},
 	{
 		Name:    "FloorFloat32x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "FloorFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -112822,6 +115024,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualFloat32s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualFloat32x16",
 		ArgLen:  2,
 		Generic: true,
@@ -112833,6 +115040,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "GreaterEqualFloat32x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterEqualFloat64s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -112852,12 +115064,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualInt16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualInt16x32",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterEqualInt16x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterEqualInt32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -112872,12 +115094,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualInt64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualInt64x2",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterEqualInt64x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterEqualInt8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -112892,12 +115124,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualUint16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualUint16x32",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterEqualUint16x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterEqualUint32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -112912,6 +115154,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualUint64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualUint64x2",
 		ArgLen:  2,
 		Generic: true,
@@ -112922,12 +115169,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterEqualUint8s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterEqualUint8x16",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterEqualUint8x64",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterFloat32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -112943,6 +115200,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "GreaterFloat32x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterFloat64s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -113042,12 +115304,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterUint16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterUint16x32",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterUint16x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterUint32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -113062,12 +115334,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "GreaterUint64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "GreaterUint64x2",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
 		Name:    "GreaterUint64x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "GreaterUint8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -114530,7 +116812,17 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:    "NegFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "NegFloat32x4",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "NegFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -114540,7 +116832,17 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "NegInt16s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "NegInt16x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "NegInt32s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -114550,7 +116852,17 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "NegInt64s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "NegInt64x2",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "NegInt8s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -114558,6 +116870,12 @@ var OpcodeTable = [...]OpInfo{
 		Name:    "NegInt8x16",
 		ArgLen:  1,
 		Generic: true,
+	},
+	{
+		Name:        "NotEqualFloat32s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
 	},
 	{
 		Name:        "NotEqualFloat32x16",
@@ -114573,6 +116891,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "NotEqualFloat32x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "NotEqualFloat64s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114596,6 +116920,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "NotEqualInt16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "NotEqualInt16x32",
 		ArgLen:      2,
 		Commutative: true,
@@ -114603,6 +116933,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "NotEqualInt16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "NotEqualInt32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114620,6 +116956,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "NotEqualInt64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "NotEqualInt64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -114627,6 +116969,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "NotEqualInt64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "NotEqualInt8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114644,6 +116992,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "NotEqualUint16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "NotEqualUint16x32",
 		ArgLen:      2,
 		Commutative: true,
@@ -114651,6 +117005,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "NotEqualUint16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "NotEqualUint32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114668,6 +117028,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "NotEqualUint64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "NotEqualUint64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -114675,6 +117041,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "NotEqualUint64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "NotEqualUint8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114852,6 +117224,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:        "OrInt16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "OrInt16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -114865,6 +117243,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "OrInt16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "OrInt32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114888,6 +117272,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "OrInt64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "OrInt64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -114901,6 +117291,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "OrInt64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "OrInt8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -114964,6 +117360,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:        "OrUint16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "OrUint16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -114977,6 +117379,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "OrUint16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "OrUint32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -115000,6 +117408,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "OrUint64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "OrUint64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -115013,6 +117427,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "OrUint64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "OrUint8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -115446,12 +117866,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "RoundFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "RoundFloat32x4",
 		ArgLen:  1,
 		Generic: true,
 	},
 	{
 		Name:    "RoundFloat32x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "RoundFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -116915,6 +119345,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SqrtFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "SqrtFloat32x16",
 		ArgLen:  1,
 		Generic: true,
@@ -116926,6 +119361,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SqrtFloat32x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "SqrtFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -116945,6 +119385,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubFloat32s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubFloat32x16",
 		ArgLen:  2,
 		Generic: true,
@@ -116956,6 +119401,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SubFloat32x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubFloat64s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -116975,6 +119425,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubInt16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubInt16x16",
 		ArgLen:  2,
 		Generic: true,
@@ -116986,6 +119441,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SubInt16x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubInt32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117005,6 +119465,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubInt64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubInt64x2",
 		ArgLen:  2,
 		Generic: true,
@@ -117016,6 +119481,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SubInt64x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubInt8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117035,6 +119505,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedInt16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedInt16x16",
 		ArgLen:  2,
 		Generic: true,
@@ -117050,12 +119525,27 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedInt32s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedInt32x4",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedInt64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedInt64x2",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubSaturatedInt8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117075,6 +119565,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedUint16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedUint16x16",
 		ArgLen:  2,
 		Generic: true,
@@ -117090,12 +119585,27 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedUint32s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedUint32x4",
 		ArgLen:  2,
 		Generic: true,
 	},
 	{
+		Name:    "SubSaturatedUint64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubSaturatedUint64x2",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubSaturatedUint8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117115,6 +119625,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubUint16s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubUint16x16",
 		ArgLen:  2,
 		Generic: true,
@@ -117126,6 +119641,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SubUint16x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubUint32s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117145,6 +119665,11 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "SubUint64s",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
 		Name:    "SubUint64x2",
 		ArgLen:  2,
 		Generic: true,
@@ -117156,6 +119681,11 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:    "SubUint64x8",
+		ArgLen:  2,
+		Generic: true,
+	},
+	{
+		Name:    "SubUint8s",
 		ArgLen:  2,
 		Generic: true,
 	},
@@ -117190,12 +119720,22 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:    "TruncFloat32s",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
 		Name:    "TruncFloat32x4",
 		ArgLen:  1,
 		Generic: true,
 	},
 	{
 		Name:    "TruncFloat32x8",
+		ArgLen:  1,
+		Generic: true,
+	},
+	{
+		Name:    "TruncFloat64s",
 		ArgLen:  1,
 		Generic: true,
 	},
@@ -117462,6 +120002,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic: true,
 	},
 	{
+		Name:        "XorInt16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "XorInt16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -117475,6 +120021,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "XorInt16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "XorInt32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -117498,6 +120050,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "XorInt64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "XorInt64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -117511,6 +120069,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "XorInt64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "XorInt8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -117534,6 +120098,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "XorUint16s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "XorUint16x16",
 		ArgLen:      2,
 		Commutative: true,
@@ -117547,6 +120117,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "XorUint16x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "XorUint32s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,
@@ -117570,6 +120146,12 @@ var OpcodeTable = [...]OpInfo{
 		Generic:     true,
 	},
 	{
+		Name:        "XorUint64s",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
 		Name:        "XorUint64x2",
 		ArgLen:      2,
 		Commutative: true,
@@ -117583,6 +120165,12 @@ var OpcodeTable = [...]OpInfo{
 	},
 	{
 		Name:        "XorUint64x8",
+		ArgLen:      2,
+		Commutative: true,
+		Generic:     true,
+	},
+	{
+		Name:        "XorUint8s",
 		ArgLen:      2,
 		Commutative: true,
 		Generic:     true,

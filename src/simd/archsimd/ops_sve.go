@@ -4,6 +4,38 @@
 
 package archsimd
 
+/* Abs */
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZFABS, CPU Feature: SVE
+func (x Float32s) Abs() Float32s
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZFABS, CPU Feature: SVE
+func (x Float64s) Abs() Float64s
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZABS, CPU Feature: SVE
+func (x Int8s) Abs() Int8s
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZABS, CPU Feature: SVE
+func (x Int16s) Abs() Int16s
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZABS, CPU Feature: SVE
+func (x Int32s) Abs() Int32s
+
+// Abs computes the absolute value of each element.
+//
+// Asm: ZABS, CPU Feature: SVE
+func (x Int64s) Abs() Int64s
+
 /* Add */
 
 // Add adds corresponding elements of two vectors.
@@ -98,7 +130,135 @@ func (x Uint32s) AddSaturated(y Uint32s) Uint32s
 // Asm: ZUQADD, CPU Feature: SVE
 func (x Uint64s) AddSaturated(y Uint64s) Uint64s
 
+/* And */
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Int8s) And(y Int8s) Int8s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Int16s) And(y Int16s) Int16s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Int32s) And(y Int32s) Int32s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Int64s) And(y Int64s) Int64s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Uint8s) And(y Uint8s) Uint8s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Uint16s) And(y Uint16s) Uint16s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Uint32s) And(y Uint32s) Uint32s
+
+// And performs a bitwise x & y.
+//
+// Asm: ZAND, CPU Feature: SVE
+func (x Uint64s) And(y Uint64s) Uint64s
+
+/* Ceil */
+
+// Ceil rounds elements up to the nearest integer.
+//
+// Asm: ZFRINTP, CPU Feature: SVE
+func (x Float32s) Ceil() Float32s
+
+// Ceil rounds elements up to the nearest integer.
+//
+// Asm: ZFRINTP, CPU Feature: SVE
+func (x Float64s) Ceil() Float64s
+
+/* Equal */
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZFCMEQ, CPU Feature: SVE
+func (x Float32s) Equal(y Float32s) Mask32s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZFCMEQ, CPU Feature: SVE
+func (x Float64s) Equal(y Float64s) Mask64s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Int8s) Equal(y Int8s) Mask8s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Int16s) Equal(y Int16s) Mask16s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Int32s) Equal(y Int32s) Mask32s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Int64s) Equal(y Int64s) Mask64s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Uint8s) Equal(y Uint8s) Mask8s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Uint16s) Equal(y Uint16s) Mask16s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Uint32s) Equal(y Uint32s) Mask32s
+
+// Equal returns a mask whose elements indicate whether x == y.
+//
+// Asm: ZCMPEQ, CPU Feature: SVE
+func (x Uint64s) Equal(y Uint64s) Mask64s
+
+/* Floor */
+
+// Floor rounds elements down to the nearest integer.
+//
+// Asm: ZFRINTM, CPU Feature: SVE
+func (x Float32s) Floor() Float32s
+
+// Floor rounds elements down to the nearest integer.
+//
+// Asm: ZFRINTM, CPU Feature: SVE
+func (x Float64s) Floor() Float64s
+
 /* Greater */
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZFCMGT, CPU Feature: SVE
+func (x Float32s) Greater(y Float32s) Mask32s
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZFCMGT, CPU Feature: SVE
+func (x Float64s) Greater(y Float64s) Mask64s
 
 // Greater returns a mask whose elements indicate whether x > y.
 //
@@ -119,6 +279,376 @@ func (x Int32s) Greater(y Int32s) Mask32s
 //
 // Asm: ZCMPGT, CPU Feature: SVE
 func (x Int64s) Greater(y Int64s) Mask64s
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZCMPHI, CPU Feature: SVE
+func (x Uint8s) Greater(y Uint8s) Mask8s
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZCMPHI, CPU Feature: SVE
+func (x Uint16s) Greater(y Uint16s) Mask16s
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZCMPHI, CPU Feature: SVE
+func (x Uint32s) Greater(y Uint32s) Mask32s
+
+// Greater returns a mask whose elements indicate whether x > y.
+//
+// Asm: ZCMPHI, CPU Feature: SVE
+func (x Uint64s) Greater(y Uint64s) Mask64s
+
+/* GreaterEqual */
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZFCMGE, CPU Feature: SVE
+func (x Float32s) GreaterEqual(y Float32s) Mask32s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZFCMGE, CPU Feature: SVE
+func (x Float64s) GreaterEqual(y Float64s) Mask64s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPGE, CPU Feature: SVE
+func (x Int8s) GreaterEqual(y Int8s) Mask8s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPGE, CPU Feature: SVE
+func (x Int16s) GreaterEqual(y Int16s) Mask16s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPGE, CPU Feature: SVE
+func (x Int32s) GreaterEqual(y Int32s) Mask32s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPGE, CPU Feature: SVE
+func (x Int64s) GreaterEqual(y Int64s) Mask64s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPHS, CPU Feature: SVE
+func (x Uint8s) GreaterEqual(y Uint8s) Mask8s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPHS, CPU Feature: SVE
+func (x Uint16s) GreaterEqual(y Uint16s) Mask16s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPHS, CPU Feature: SVE
+func (x Uint32s) GreaterEqual(y Uint32s) Mask32s
+
+// GreaterEqual returns a mask whose elements indicate whether x >= y.
+//
+// Asm: ZCMPHS, CPU Feature: SVE
+func (x Uint64s) GreaterEqual(y Uint64s) Mask64s
+
+/* Neg */
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZFNEG, CPU Feature: SVE
+func (x Float32s) Neg() Float32s
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZFNEG, CPU Feature: SVE
+func (x Float64s) Neg() Float64s
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZNEG, CPU Feature: SVE
+func (x Int8s) Neg() Int8s
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZNEG, CPU Feature: SVE
+func (x Int16s) Neg() Int16s
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZNEG, CPU Feature: SVE
+func (x Int32s) Neg() Int32s
+
+// Neg returns the elementwise negation of x.
+//
+// Asm: ZNEG, CPU Feature: SVE
+func (x Int64s) Neg() Int64s
+
+/* NotEqual */
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZFCMNE, CPU Feature: SVE
+func (x Float32s) NotEqual(y Float32s) Mask32s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZFCMNE, CPU Feature: SVE
+func (x Float64s) NotEqual(y Float64s) Mask64s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Int8s) NotEqual(y Int8s) Mask8s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Int16s) NotEqual(y Int16s) Mask16s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Int32s) NotEqual(y Int32s) Mask32s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Int64s) NotEqual(y Int64s) Mask64s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Uint8s) NotEqual(y Uint8s) Mask8s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Uint16s) NotEqual(y Uint16s) Mask16s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Uint32s) NotEqual(y Uint32s) Mask32s
+
+// NotEqual returns a mask whose elements indicate whether x != y.
+//
+// Asm: ZCMPNE, CPU Feature: SVE
+func (x Uint64s) NotEqual(y Uint64s) Mask64s
+
+/* Or */
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Int8s) Or(y Int8s) Int8s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Int16s) Or(y Int16s) Int16s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Int32s) Or(y Int32s) Int32s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Int64s) Or(y Int64s) Int64s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Uint8s) Or(y Uint8s) Uint8s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Uint16s) Or(y Uint16s) Uint16s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Uint32s) Or(y Uint32s) Uint32s
+
+// Or performs a bitwise x | y.
+//
+// Asm: ZORR, CPU Feature: SVE
+func (x Uint64s) Or(y Uint64s) Uint64s
+
+/* Round */
+
+// Round rounds elements to the nearest integer, rounding ties to even.
+//
+// Asm: ZFRINTN, CPU Feature: SVE
+func (x Float32s) Round() Float32s
+
+// Round rounds elements to the nearest integer, rounding ties to even.
+//
+// Asm: ZFRINTN, CPU Feature: SVE
+func (x Float64s) Round() Float64s
+
+/* Sqrt */
+
+// Sqrt computes the square root of each element.
+//
+// Asm: ZFSQRT, CPU Feature: SVE
+func (x Float32s) Sqrt() Float32s
+
+// Sqrt computes the square root of each element.
+//
+// Asm: ZFSQRT, CPU Feature: SVE
+func (x Float64s) Sqrt() Float64s
+
+/* Sub */
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZFSUB, CPU Feature: SVE
+func (x Float32s) Sub(y Float32s) Float32s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZFSUB, CPU Feature: SVE
+func (x Float64s) Sub(y Float64s) Float64s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Int8s) Sub(y Int8s) Int8s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Int16s) Sub(y Int16s) Int16s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Int32s) Sub(y Int32s) Int32s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Int64s) Sub(y Int64s) Int64s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Uint8s) Sub(y Uint8s) Uint8s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Uint16s) Sub(y Uint16s) Uint16s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Uint32s) Sub(y Uint32s) Uint32s
+
+// Sub subtracts corresponding elements of two vectors.
+//
+// Asm: ZSUB, CPU Feature: SVE
+func (x Uint64s) Sub(y Uint64s) Uint64s
+
+/* SubSaturated */
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZSQSUB, CPU Feature: SVE
+func (x Int8s) SubSaturated(y Int8s) Int8s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZSQSUB, CPU Feature: SVE
+func (x Int16s) SubSaturated(y Int16s) Int16s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZSQSUB, CPU Feature: SVE
+func (x Int32s) SubSaturated(y Int32s) Int32s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZSQSUB, CPU Feature: SVE
+func (x Int64s) SubSaturated(y Int64s) Int64s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZUQSUB, CPU Feature: SVE
+func (x Uint8s) SubSaturated(y Uint8s) Uint8s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZUQSUB, CPU Feature: SVE
+func (x Uint16s) SubSaturated(y Uint16s) Uint16s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZUQSUB, CPU Feature: SVE
+func (x Uint32s) SubSaturated(y Uint32s) Uint32s
+
+// SubSaturated subtracts corresponding elements of two vectors with saturation.
+//
+// Asm: ZUQSUB, CPU Feature: SVE
+func (x Uint64s) SubSaturated(y Uint64s) Uint64s
+
+/* Trunc */
+
+// Trunc truncates elements towards zero.
+//
+// Asm: ZFRINTZ, CPU Feature: SVE
+func (x Float32s) Trunc() Float32s
+
+// Trunc truncates elements towards zero.
+//
+// Asm: ZFRINTZ, CPU Feature: SVE
+func (x Float64s) Trunc() Float64s
+
+/* Xor */
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Int8s) Xor(y Int8s) Int8s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Int16s) Xor(y Int16s) Int16s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Int32s) Xor(y Int32s) Int32s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Int64s) Xor(y Int64s) Int64s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Uint8s) Xor(y Uint8s) Uint8s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Uint16s) Xor(y Uint16s) Uint16s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Uint32s) Xor(y Uint32s) Uint32s
+
+// Xor performs a bitwise x ^ y.
+//
+// Asm: ZEOR, CPU Feature: SVE
+func (x Uint64s) Xor(y Uint64s) Uint64s
 
 // BitsToInt8 reinterprets the bits of a Uint8s vector as a Int8s vector
 func (x Uint8s) BitsToInt8() Int8s

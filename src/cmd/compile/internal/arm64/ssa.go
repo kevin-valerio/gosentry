@@ -2163,6 +2163,12 @@ func simdZ2kvPred(s *ssagen.State, v *ssa.Value, arng int16) *obj.Prog {
 	switch d {
 	case x:
 	case y:
+		// Only reachable for a commutative operation: a non-commutative one is
+		// marked resultInArg0, which pins the destination to arg0. Swapping the
+		// sources of one would compute y-x where x-y was asked for.
+		if v.Op.ResultInArg0() {
+			v.Fatalf("destination is arg1 of resultInArg0 op %v", v.Op)
+		}
 		x, y = y, x
 	default:
 		mp := s.Prog(arm64.AZMOVPRFX)
@@ -2178,6 +2184,35 @@ func simdZ2kvPred(s *ssagen.State, v *ssa.Value, arng int16) *obj.Prog {
 	p.AddRestSourceReg(pregMask(v.Args[2].Reg(), arm64.PRED_M)) // Pg/M
 	p.To.Type = obj.TYPE_REG
 	p.To.Reg = zregArng(d, arng) // Zdn
+	return p
+}
+
+// simdZkv emits a predicated-only SVE unary operation standing in for an
+// unpredicated one, e.g. ZABS Z0.B, P0.M, Z1.B. SSA provides arg0=x and
+// arg1=the governing predicate, which the lowering rule synthesized as
+// all-true. With every lane active, merging predication leaves nothing of the
+// destination behind, so the operation is unpredicated in effect.
+func simdZkv(s *ssagen.State, v *ssa.Value, arng int16) *obj.Prog {
+	return sveUnaryPred(s, v, arng, v.Args[0].Reg(), v.Args[1].Reg(), arm64.PRED_M)
+}
+
+// simdZ2kvPredResultInArg0 emits the merging form of a predicated SVE unary
+// operation, e.g. ZABS Z1.B, P0.M, Z0.B. SSA provides arg0=the value the
+// inactive lanes keep, arg1=x, arg2=mask, and resultInArg0 puts that value in
+// the destination. The instruction is constructive -- it names its destination
+// apart from its source -- so merging into that destination needs no MOVPRFX.
+func simdZ2kvPredResultInArg0(s *ssagen.State, v *ssa.Value, arng int16) *obj.Prog {
+	return sveUnaryPred(s, v, arng, v.Args[1].Reg(), v.Args[2].Reg(), arm64.PRED_M)
+}
+
+// sveUnaryPred emits a predicated SVE unary operation: OP Zn.T, Pg/<qual>, Zd.T.
+func sveUnaryPred(s *ssagen.State, v *ssa.Value, arng int16, zn, pg int16, qual int16) *obj.Prog {
+	p := s.Prog(v.Op.Asm())
+	p.From.Type = obj.TYPE_REG
+	p.From.Reg = zregArng(zn, arng)        // Zn
+	p.AddRestSourceReg(pregMask(pg, qual)) // Pg/M or Pg/Z
+	p.To.Type = obj.TYPE_REG
+	p.To.Reg = zregArng(v.Reg(), arng) // Zd
 	return p
 }
 
